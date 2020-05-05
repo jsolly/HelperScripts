@@ -14,7 +14,7 @@ import edit_stuff
 def convert_box_note(boxnote_path):
     filename = os.path.basename(boxnote_path).split('.')[0]
     note = BoxNote.from_file(boxnote_path)
-    markdown = note.as_markdown() # returns a markdown string
+    markdown = note.as_markdown() # returns a markdown strings
 
     with open(f"{filename}.md", 'w') as writer_obj:
         writer_obj.write(markdown)
