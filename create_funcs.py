@@ -68,8 +68,8 @@ def create_webmaps_from_feature_layer_items(layer_items, agol_folder):
         create_webmap_from_feature_layer_item(layer_item, agol_folder)
 
 def create_webmap_from_feature_layer_item(layer_item, agol_folder=None, title=None):
-    if not title:
-        title = layer_item.title
+
+    title = layer_item.title if title is None else title
 
     webmap_item_properties = {"title":title, "tags":layer_item.id, "snippet":"This is a snippet"}
     webmap = mapping.WebMap()

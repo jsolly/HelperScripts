@@ -90,8 +90,7 @@ def save_file (data, filename, type, save_folder=None): # ~/Downloads (Work lapt
 
 def download_item_json(item, save_folder=None, pretty_json=None):
 
-    if save_folder == None:
-        save_folder = "../Data/JSON"
+    save_folder = "../Data/JSON" if not save_folder else save_folder
 
     try:
         json = item.get_data()
@@ -105,8 +104,8 @@ def download_item_json(item, save_folder=None, pretty_json=None):
         traceback.print_exc()
 
 def save_file_locally(data, file_name, file_ext, folder_path=None):
-    if folder_path is None:
-        folder_path = "../../Data_Output/"
+
+    folder_path = "../../Data_Output/" if folder_path is None else folder_path
 
     with open(f"{folder_path}{file_name}.{file_ext}") as file: 
         file.write(data)
