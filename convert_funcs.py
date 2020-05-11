@@ -6,10 +6,11 @@ import subprocess
 import pandas as pd
 from pyproj import Proj, transform
 from arcgis.features import FeatureSet
-from shapely.geometry import Point
+
+# from shapely.geometry import Point
 from boxnotes2html import BoxNote
-import get_stuff
-import edit_stuff
+from GitHub.HelperScripts import get_funcs
+from GitHub.HelperScripts import edit_funcs
 
 
 def convert_box_note(boxnote_path):
@@ -27,16 +28,16 @@ def csv_from_excel(xls_path):
     data_xls.to_csv(filename + ".csv", encoding="utf-8")
 
 
-def list_to_string(list, seperator=", ") -> str:
-    return seperator.join(str(x) for x in list)
+def list_to_string(my_list, seperator=", ") -> str:
+    return seperator.join(str(x) for x in my_list)
 
 
 def zip_shapefiles_in_directory(
     data_folder, delete_originals=False
 ):  # Keep working on this.
 
-    filenames = get_stuff.get_files_in_directory(
-        folder_path=data_folder, full_path=True, file_type=".shp"
+    filenames = get_funcs.get_files_in_directory(
+        directory=data_folder, extension=".shp"
     )
 
     for filename in filenames:
@@ -49,26 +50,19 @@ def zip_shapefiles_in_directory(
             zippy.write(f"{path_parent}/{filename}.prj", arcname=f"{filename}.prj")
 
     if delete_originals:
-        edit_stuff.delete_unzipped_shp_files_from_directory(data_folder)
+        edit_funcs.delete_unzipped_shp_files_from_directory(data_folder)
 
 
 def json_to_python_dict(json_str) -> dict:
-    """
-    Json is really just a big string, so this function returns a python dict version of a JSON file.
-    :param json_path: A json file to be converted into a python dict
-    :type json_path: A path to a json file
-    :return: A python dictionary representation of a json file
-    :rtype: Python Dictionary
-    """
     json_acceptable_string = json_str.replace("'", '"')
     python_dict = json.loads(json_acceptable_string)
     return python_dict
 
 
-def get_projection(factory_code):
-    s = osr.SpatialReference()
-    s.ImportFromEPSG(factory_code)
-    print(s.GetAttrValue("PROJCS"))
+# def get_projection(factory_code):
+#     s = osr.SpatialReference()
+#     s.ImportFromEPSG(factory_code)
+#     print(s.GetAttrValue("PROJCS"))
 
 
 def pandas_df_to_esri_feature_set(pandas_df):
@@ -88,10 +82,7 @@ def string_to_json(string) -> json:
 
 
 def ogr_convert_file(
-    origin_file_path,
-    converted_file_extension,
-    destination_folder=None,
-    delete_original=False,
+    origin_file_path, converted_file_extension, destination_folder=None
 ):
 
     filename = PurePath(origin_file_path).stem
@@ -109,35 +100,35 @@ def ogr_convert_file(
         subprocess.Popen(args)
 
 
-def pandas_df_to_GeoDataFrame(df):
-    df["Coordinates"] = list(zip(df.Longitude, df.Latitude))
-    df["Coordinates"] = df["Coordinates"].apply(Point)
+# def pandas_df_to_geo_data_frame(df):
+#     df["Coordinates"] = list(zip(df.Longitude, df.Latitude))
+#     df["Coordinates"] = df["Coordinates"].apply(Point)
+#
+#     geo_data_frame = geopandas.GeoDataFrame(df, geometry="Coordinates")
+#     geo_data_frame.crs = {"init": "epsg:4326"}
+#
+#     return geopandas.GeoDataFrame(df, geometry="Coordinates")
 
-    geo_data_frame = geopandas.GeoDataFrame(df, geometry="Coordinates")
-    geo_data_frame.crs = {"init": "epsg:4326"}
 
-    return geopandas.GeoDataFrame(df, geometry="Coordinates")
-
-
-def GeoDataFrame_to_shapefile(geo_data_frame, shapefile_save_path):
+def geo_data_frame_to_shapefile(geo_data_frame, shapefile_save_path):
     geo_data_frame.to_file(filename=shapefile_save_path, driver="ESRI Shapefile")
 
 
-def convert_coordinates(coordinates: tuple, inproj_epsg_id: str, outProj_epsg_id: str):
-    inProj = Proj(init=f"epsg:{inproj_epsg_id}")
-    outProj = Proj(init=f"epsg:{outProj_epsg_id}")
-    projected_coordinates = transform(inProj, outProj, *coordinates)
+def convert_coordinates(coordinates: tuple, inproj_epsg_id: str, out_proj_epsg_id: str):
+    in_proj = Proj(init=f"epsg:{inproj_epsg_id}")
+    out_proj = Proj(init=f"epsg:{out_proj_epsg_id}")
+    projected_coordinates = transform(in_proj, out_proj, *coordinates)
     return projected_coordinates
 
 
-def combine_pdfs(pdf_binary_objs):
-    merger = PdfFileMerger()
-
-    for pdf in pdf_binary_objs:
-        merger.append(pdf)
-
-    with open("output/Dashboard_test_areas.pdf", "wb") as fout:
-        merger.write(fout)
+# def combine_pdfs(pdf_binary_objs):
+#     merger = PdfFileMerger()
+#
+#     for pdf in pdf_binary_objs:
+#         merger.append(pdf)
+#
+#     with open("output/Dashboard_test_areas.pdf", "wb") as fout:
+#         merger.write(fout)
 
 
 if __name__ == "__main__":

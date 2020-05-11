@@ -57,7 +57,7 @@ def create_object_id_string(number_of_objects):
 
 def merge_shape_files(shape_file_folder, merged_name="Merged.shp"):
     shapefiles = get_funcs.get_files_in_directory(
-        folder_path=shape_file_folder, file_type=".shp"
+        directory=shape_file_folder, extension=".shp"
     )
     shapefiles_comma_seperated_string = convert_funcs.list_to_string(shapefiles)
 
@@ -179,4 +179,9 @@ if __name__ == "__main__":
     # Add and publish a dashboard JSONS
     # FILES = get_funcs.get_files_in_directory(LOCAL_DIRECTORY)
     # for FILE in FILES:
-    # add_and_publish_file(gis_obj=GIS_USER, file_path=FILE._str, file_type='Dashboard', agol_folder='maxPaginationRecords')
+    # add_and_publish_file(
+    #     gis_obj=GIS_USER,
+    #     file_path=FILE._str,
+    #     file_type="Dashboard",
+    #     agol_folder="maxPaginationRecords",
+    # )

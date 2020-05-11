@@ -4,12 +4,10 @@ from pathlib import PurePosixPath
 import argparse
 from pyproj import Proj, transform
 from arcgis import gis, features
-import convert_stuff
-import get_stuff
+from GitHub.HelperScripts import get_funcs
 
 
 def add_type_keywords_to_item(item, type_keywords_to_be_added):
-    item_properties = {}
     final_type_keywords_diff = set(type_keywords_to_be_added).difference(
         set(item["type_keywords"])
     )
@@ -25,27 +23,23 @@ def add_type_keywords_to_item(item, type_keywords_to_be_added):
     item.update(item_properties=item_properties)
 
 
-def remove_type_keywords_from_item(item, type_keywords_to_be_removed):
-    item_properties = {}
-    final_type_keywords_intersection = set(type_keywords_to_be_removed).difference(
-        set(item["type_keywords"])
-    )
-
-    final_type_keywords_string = "".join(final_type_keywords_diff)
-    item_properties = {"type_keywords": final_type_keywords_string}
-    print(
-        "I am removing type_keywords '{}' from item {}".format(
-            type_keywords_to_be_removed, item.title
-        )
-    )
-    item.update(item_properties=item_properties)
+#
+# def remove_type_keywords_from_item(item, type_keywords_to_be_removed):
+#     final_type_keywords_string = "".join(final_type_keywords_diff)
+#     item_properties = {"type_keywords": final_type_keywords_string}
+#     print(
+#         "I am removing type_keywords '{}' from item {}".format(
+#             type_keywords_to_be_removed, item.title
+#         )
+#     )
+#     item.update(item_properties=item_properties)
 
 
-def toggle_save_as_on_item(item):
-    if "useOnly" not in item["type_keywords"]:
-        add_type_keywords_to_item(item, ["useOnly"])
-    else:
-        remove_type_keywords_from_item(item, ["useOnly"])
+# def toggle_save_as_on_item(item):
+#     if "useOnly" not in item["type_keywords"]:
+#         add_type_keywords_to_item(item, ["useOnly"])
+#     else:
+#         remove_type_keywords_from_item(item, ["useOnly"])
 
 
 def share_all_items_in_agol_account(
@@ -71,33 +65,33 @@ def share_all_items_in_folder(gis, folder, org=False, everyone=False, groups=Non
 
 
 def add_file_extensions(folder_path, extension):
-    files = get_stuff.get_files_in_directory(folder_path=folder_path, file_type="")
+    files = get_funcs.get_files_in_directory(folder_path=folder_path, file_type="")
     for file in files:
         file_stem = PurePosixPath(file).stem
         os.rename(file, f"{file_stem}.{extension}")
 
 
-def add_feature_layer_to_webmap_json(feature_layer, webmap_json) -> dict:
-    """
-    Adds a layer to an unpublished webmap json
-    :param feature_layer: An Esri layer object that will be added to a webmap
-    :type feature_layer: An Esri layer object
-    :param webmap_json: A json representation of a webmap. This webmap can have 0 - > n operational layers.
-                        This function will add one more operational layer.
-    :type webmap_json: A json file
-    :return: A new python dictionary is returned. This dictionary is exactly the same as the input except that it has
-             one more operational layer.
-    """
-    # I might have broke this
-
-    feature_layer_dict = {
-        "title": feature_layer.properties["name"],
-        "url": feature_layer.url,
-    }
-    # Add the layer as an operational layer
-    webmap_json["operationalLayers"].update(feature_layer_dict)
-
-    print(webmap_json)
+# def add_feature_layer_to_webmap_json(feature_layer, webmap_json):  # Broken?
+#     """
+#     Adds a layer to an unpublished webmap json
+#     :param feature_layer: An Esri layer object that will be added to a webmap
+#     :type feature_layer: An Esri layer object
+#     :param webmap_json: A json representation of a webmap. This webmap can have 0 - > n operational layers.
+#                         This function will add one more operational layer.
+#     :type webmap_json: A json file
+#     :return: A new python dictionary is returned. This dictionary is exactly the same as the input except that it has
+#              one more operational layer.
+#     """
+#     # I might have broke this
+#
+#     feature_layer_dict = {
+#         "title": feature_layer.properties["name"],
+#         "url": feature_layer.url,
+#     }
+#     # Add the layer as an operational layer
+#     webmap_json["operationalLayers"].update(feature_layer_dict)
+#
+#     return webmap_json
 
 
 def add_json_layer_to_webmap_json(json_layer, webmap_json) -> json:
@@ -137,10 +131,6 @@ def delete_unzipped_shp_files_from_directory(folder):
     return
 
 
-def move_feature_to_location(feature, coordinate_tuple):
-    print("TODO")
-
-
 def df_to_agol(gis, df, title):
     feature_collection = gis.content.import_data(df=df, title=title)
     item_properties = {
@@ -166,17 +156,16 @@ def convert_projection(coordinate_tuple, in_prj, out_prj):
         [tuple]: [description]
     """
     x1, y1 = coordinate_tuple
-    inProj = Proj(init="epsg:3857")
-    outProj = Proj(init="epsg:4326")
-    x1, y1 = transform(inProj, outProj, x1, y1)
-    return (x1, y1)
+    x1, y1 = transform(in_prj, out_prj, x1, y1)
+    return x1, y1
 
 
-def add_prj_to_shapefiles(shapefile_folder):
-    shapefiles = get_stuff.get_files_in_directory(
-        folder_path=shapefile_folder, file_type=".shp"
-    )
-    shapefiles_comma_seperated_string = convert_stuff.list_to_string(shapefiles)
+#
+# def add_prj_to_shapefiles(shapefile_folder):
+#     shapefiles = get_funcs.get_files_in_directory(
+#         folder_path=shapefile_folder, file_type=".shp"
+#     )
+#     shapefiles_comma_seperated_string = convert_funcs.list_to_string(shapefiles)
 
 
 def remove_features_from_feature_layer(feature_layer, number_of_features_to_remove):
@@ -192,7 +181,7 @@ def remove_features_from_feature_layer(feature_layer, number_of_features_to_remo
 
 
 def change_webmap_in_local_dashboard_json(dashboard_json_path, new_webmap_id):
-    with open(dashboard_json_path, "r") as read_obj:
+    with open(dashboard_json_path) as read_obj:
         with open(f"{dashboard_json_path}_MODIFIED", "w") as write_obj:
             dashboard_dict = json.load(read_obj)
             dashboard_dict["widgets"][0]["itemId"] = new_webmap_id
@@ -231,7 +220,7 @@ if __name__ == "__main__":
 
     # add_file_extensions(folder_path="~/Downloads", extension="json")
 
-    ### Delete an Item
+    # Delete an Item
     # item = gis.Item(GIS_USER, "")
     # item.delete()
 

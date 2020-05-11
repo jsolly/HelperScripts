@@ -1,10 +1,7 @@
 from arcgis import features, gis
-from GitHub.HelperScripts import convert_funcs
 import os
 from pathlib import Path
 import traceback
-import pprint
-import argparse
 from arcgis.gis.server import Server
 from arcgis import gis, mapping
 
@@ -81,12 +78,12 @@ def get_constructed_layers_from_from_webmap_obj(webmap_obj, gis_obj) -> list:
                     if bool(layer.url[-1].isdigit()):
                         layer = features.FeatureLayer(url=layer.url, gis=gis_obj)
                         # sometimes accessing properties triggers an attribute error.
-                        layer.properties
+                        assert layer.properties
                     else:
                         layer = features.FeatureLayerCollection(
                             url=layer.url, gis=gis_obj
                         )
-                        layer.properties
+                        assert layer.properties
                 except:
                     pass
 
@@ -261,27 +258,6 @@ def get_service_credential(
 
 def get_folder_names(gis):
     return gis.users.me.folders
-
-
-def get_items_from_folders(
-    gis_obj, folders: list, item_types=None
-) -> list:  # folder=None returns items in the root folder
-    all_items = []
-    for folder in folders:
-        all_items += get_items_from_folder(gis_obj, folder, item_types)
-
-    return all_items
-
-
-def get_items_from_folder(
-    gis_obj, folder, item_types=None
-) -> list:  # folder=None returns items in the root folder
-    folder_items = gis_obj.users.me.items(folder=folder)
-
-    if item_types:
-        folder_items = [item for item in folder_items if item.type in item_types]
-
-    return folder_items
 
 
 def get_layer_attachmets(layer):  # Add return type?

@@ -107,8 +107,8 @@ def clone_operational_layers_to_new_webmap(source_webmap_obj, target_webmap_obj)
 
 def save_file(data, filename, file_type, save_folder=None):  # ~/Downloads (Work laptop)
     try:
-        if type == "geojson":
-            data = geojson.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
+        # if type == "geojson":
+        #     data = geojson.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
 
         if file_type == "json":
             data = json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
@@ -143,7 +143,7 @@ def save_file_locally(data, file_name, file_ext, folder_path=None):
 
 
 def download_all_item_json_from_agol_folder(
-    gis_obj, agol_folder, save_folder, pretty_json=False
+    gis_obj, agol_folder, save_folder
 ):  # "~/Downloads" mac laptop
 
     if Path(save_folder).is_dir():
@@ -169,7 +169,7 @@ def clone_ags_to_agol(gis_obj, feature_layer_url):
 
     # Turn Feature Layer to a Feature Set
     feature_layer = features.FeatureLayer(url=feature_layer_url)
-    feature_set = features.feature_layer.query()  # where="1=1", out_fields="*"
+    feature_set = feature_layer.query()  # where="1=1", out_fields="*"
 
     # Turn FeatureSet into Feature
     feature_collection = features.FeatureCollection.from_featureset(feature_set)
