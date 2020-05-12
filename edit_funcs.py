@@ -2,25 +2,25 @@ import os
 import json
 from pathlib import PurePosixPath
 import argparse
-from pyproj import Proj, transform
+from pyproj import transform
 from arcgis import gis, features
 from GitHub.HelperScripts import get_funcs
 
 
-def add_type_keywords_to_item(item, type_keywords_to_be_added):
-    final_type_keywords_diff = set(type_keywords_to_be_added).difference(
-        set(item["type_keywords"])
-    )
-    final_type_keywords_string = "".join(
-        item["type_keywords"], final_type_keywords_diff
-    )
-    item_properties = {"type_keywords": final_type_keywords_string}
-    print(
-        "I am adding type_keywords '{}' from item {}".format(
-            type_keywords_to_be_added, item.title
-        )
-    )
-    item.update(item_properties=item_properties)
+# def add_type_keywords_to_item(item, type_keywords_to_be_added):
+#     final_type_keywords_diff = set(type_keywords_to_be_added).difference(
+#         set(item["type_keywords"])
+#     )
+#     final_type_keywords_string = "".join(
+#         item["type_keywords"], final_type_keywords_diff
+#     )
+#     item_properties = {"type_keywords": final_type_keywords_string}
+#     print(
+#         "I am adding type_keywords '{}' from item {}".format(
+#             type_keywords_to_be_added, item.title
+#         )
+#     )
+#     item.update(item_properties=item_properties)
 
 
 #
@@ -43,11 +43,11 @@ def add_type_keywords_to_item(item, type_keywords_to_be_added):
 
 
 def share_all_items_in_agol_account(
-    gis, org=False, everyone=False, groups=None, ignore_folder=None
+    gis_obj, org=False, everyone=False, groups=None, ignore_folder=None
 ):  # might have broken this
-    folders = gis.users.me.folders
+    folders = gis_obj.users.me.folders
     for folder in folders:
-        items = gis.users.me.items(folder=folder)
+        items = gis_obj.users.me.items(folder=folder)
 
         if folder == ignore_folder:
             for item in items:
@@ -58,14 +58,14 @@ def share_all_items_in_agol_account(
                 print(item.share(org=org, everyone=everyone, groups=groups))
 
 
-def share_all_items_in_folder(gis, folder, org=False, everyone=False, groups=None):
-    items = gis.users.me.items(folder=folder)
+def share_all_items_in_folder(gis_obj, folder, org=False, everyone=False, groups=None):
+    items = gis_obj.users.me.items(folder=folder)
     for item in items:
         print(item.share(org=org, everyone=everyone, groups=groups))
 
 
 def add_file_extensions(folder_path, extension):
-    files = get_funcs.get_files_in_directory(folder_path=folder_path, file_type="")
+    files = get_funcs.get_files_in_directory(directory=folder_path, extension=extension)
     for file in files:
         file_stem = PurePosixPath(file).stem
         os.rename(file, f"{file_stem}.{extension}")
@@ -104,8 +104,8 @@ def overwrite_feature_service(feature_service_url, source_data):
     print(feature_layer_collection.manager.overwrite(source_data))
 
 
-def delete_items_from_folder(gis, agol_folder):
-    items = gis.users.me.items(folder=agol_folder)
+def delete_items_from_folder(gis_obj, agol_folder):
+    items = gis_obj.users.me.items(folder=agol_folder)
     for item in items:
         item.delete()
     return
@@ -131,8 +131,8 @@ def delete_unzipped_shp_files_from_directory(folder):
     return
 
 
-def df_to_agol(gis, df, title):
-    feature_collection = gis.content.import_data(df=df, title=title)
+def df_to_agol(gis_obj, df, title):
+    feature_collection = gis_obj.content.import_data(df=df, title=title)
     item_properties = {
         "title": title,
         "text": json.dumps(
@@ -140,7 +140,7 @@ def df_to_agol(gis, df, title):
         ),
         "type": "Feature Collection",
     }
-    gis.content.add(item_properties=item_properties).publish()
+    gis_obj.content.add(item_properties=item_properties).publish()
 
 
 def convert_projection(coordinate_tuple, in_prj, out_prj):
@@ -168,14 +168,14 @@ def convert_projection(coordinate_tuple, in_prj, out_prj):
 #     shapefiles_comma_seperated_string = convert_funcs.list_to_string(shapefiles)
 
 
-def remove_features_from_feature_layer(feature_layer, number_of_features_to_remove):
-    feature_set_copy = feature_layer.query()
+def remove_features_from_feature_layer(feature_layer_obj, number_of_features_to_remove):
+    feature_set_copy = feature_layer_obj.query()
     feature_set_features = feature_set_copy._features
 
     features_to_remove = feature_set_features[:number_of_features_to_remove]
     feature_set_copy._features = features_to_remove
 
-    feature_layer.edit_features(deletes=feature_set_copy)
+    feature_layer_obj.edit_features(deletes=feature_set_copy)
 
     # Write a function that leverages my prj folder
 

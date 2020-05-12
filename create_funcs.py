@@ -20,24 +20,17 @@ def add_and_publish_file(
         title = path_obj.stem
 
     item_prop = {"title": title, "type": file_type}
-    try:
-        item = gis_obj.content.add(
-            item_properties=item_prop, data=file_path, folder=agol_folder
-        )
-        if file_type != "Dashboard":
-            item = item.publish()
-        return item
-
-    except Exception:
-        traceback.print_exc()
+    item = gis_obj.content.add(
+        item_properties=item_prop, data=file_path, folder=agol_folder
+    )
+    if file_type != "Dashboard":
+        item = item.publish()
+    return item
 
 
 def publish_items(items: list):
     for item in items:
-        try:
-            item.publish()
-        except Exception:
-            traceback.print_exc()
+        item.publish()
 
 
 def publish_items_in_folder(gis_obj, agol_folder):
@@ -46,7 +39,8 @@ def publish_items_in_folder(gis_obj, agol_folder):
 
 
 def rest_publish_item(parameters: dict):
-    publish_url = f"https://{secrets.AGOL_DEV_REST_BASE_URL}/sharing/rest/content/users/{secrets.AGOL_DBQA_REGRESSION_USERNAME}/publish"
+    publish_url = f"https://{secrets.AGOL_DEV_REST_BASE_URL}/sharing/rest/content/users/\
+        {secrets.AGOL_DBQA_REGRESSION_USERNAME}/publish"
     response = requests.post(publish_url, data=parameters)
     print(response.text)
 
@@ -158,10 +152,7 @@ def create_storymap_journal_with_dashboard_url(dashboard_url):
 
 
 def create_group_in_agol(gis_obj, group_name):
-    try:
-        gis_obj.groups.create(title=group_name, tags="DashboardQA")
-    except Exception:  # If the group is already there
-        traceback.print_exc()
+    gis_obj.groups.create(title=group_name, tags="DashboardQA")
 
 
 if __name__ == "__main__":

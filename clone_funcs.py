@@ -1,6 +1,5 @@
 from pathlib import Path
 import json
-import traceback
 from arcgis import mapping, features
 from GitHub.HelperScripts import get_funcs
 
@@ -21,7 +20,7 @@ def clone_folder(
         for item in items_list:
             if item.type in ignore_item_type:
                 items_list.remove(item)
-    try:
+
         for item in items_list:
             target_gis.content.clone_items(
                 items=[item],
@@ -29,8 +28,6 @@ def clone_folder(
                 copy_data=copy_data,
                 search_existing_items=search_existing_items,
             )
-    except:
-        traceback.print_exc()
 
 
 def clone_group(
@@ -71,16 +68,11 @@ def weak_clone_items(items: list, target_gis, target_folder, flip_https):
         else:
             item_url = item.url
 
-        item_properties = {}
-        try:
-            item_properties["type"] = item.type
-            item_properties["title"] = item.title
-            item_properties["url"] = item_url
-            target_gis.content.add(
-                item_properties=item_properties, data=item_url, folder=target_folder
-            )
-        except Exception:
-            traceback.print_exc()
+        item_properties = {"type": item.type, "title": item.title, "url": item_url}
+
+        target_gis.content.add(
+            item_properties=item_properties, data=item_url, folder=target_folder
+        )
 
 
 def clone_folders(source_gis, target_gis):
@@ -106,31 +98,24 @@ def clone_operational_layers_to_new_webmap(source_webmap_obj, target_webmap_obj)
 
 
 def save_file(data, filename, file_type, save_folder=None):  # ~/Downloads (Work laptop)
-    try:
-        # if type == "geojson":
-        #     data = geojson.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
+    # if type == "geojson":
+    #     data = geojson.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
 
-        if file_type == "json":
-            data = json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
+    if file_type == "json":
+        data = json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
 
-        with open(f"{save_folder}/{filename}.{file_type}", "w") as outfile:
-            outfile.write(data)
-    except Exception:
-        traceback.print_exc()
+    with open(f"{save_folder}/{filename}.{file_type}", "w") as outfile:
+        outfile.write(data)
 
 
 def download_item_json(item, save_folder=None):
 
     save_folder = "../Data/JSON" if not save_folder else save_folder
 
-    try:
-        json_data = item.get_data()
-        save_file(
-            data=json_data, filename=item.id, file_type="json", save_folder=save_folder
-        )
-
-    except Exception:
-        traceback.print_exc()
+    json_data = item.get_data()
+    save_file(
+        data=json_data, filename=item.id, file_type="json", save_folder=save_folder
+    )
 
 
 def save_file_locally(data, file_name, file_ext, folder_path=None):
