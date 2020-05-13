@@ -4,7 +4,7 @@ from arcgis import gis, mapping, features
 from arcgis.apps import storymap
 import requests
 import traceback
-from other import my_secrets as secrets
+from other.my_secrets import AGOL_DICT
 from pathlib import Path
 from GitHub.HelperScripts import convert_funcs, get_funcs
 
@@ -39,8 +39,8 @@ def publish_items_in_folder(gis_obj, agol_folder):
 
 
 def rest_publish_item(parameters: dict):
-    publish_url = f"https://{secrets.AGOL_DEV_REST_BASE_URL}/sharing/rest/content/users/\
-        {secrets.AGOL_DBQA_REGRESSION_USERNAME}/publish"
+    publish_url = f"https://{AGOL_DICT['AGOL_DEV_REST_BASE_URL']}/sharing/rest/content/users/\
+        {AGOL_DICT['AGOL_DBQA_REGRESSION_USERNAME']}/publish"
     response = requests.post(publish_url, data=parameters)
     print(response.text)
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     FILE_PATH = f"{HOME}/Downloads/RedlandsCensusBlocksNearEsri.zip"
 
     add_and_publish_file(
-        secrets.REGRESSION_DEVEXT_DBQA_GIS,
+        AGOL_DICT["REGRESSION_DEVEXT_DBQA_GIS"],
         file_path=FILE_PATH,
         file_type="File Geodatabase",
         agol_folder=DESTINATION_AGOL_FOLDER,
