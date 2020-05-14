@@ -7,6 +7,18 @@ AUTOMATION_DEVEXT_DBQA_GIS = get_automation_devext_dbqa_gis()
 
 
 class TestClass(unittest.TestCase):
+    def test_get_item_id_from_dashboard_url(self):
+        url = "https://devext.arcgis.com/apps/opsdashboard/index.html#/461ac62237774768bb40bca2b2b4c867"
+        item_id = get_funcs.get_item_id_from_dashboard_url(url)
+        self.assertEqual(item_id, "461ac62237774768bb40bca2b2b4c867")
+
+    def test_get_story_map_entries(self):
+        story_map_item = AUTOMATION_DEVEXT_DBQA_GIS.content.get(
+            "614a35d1a4ac4ab894efed130dee3f2a"
+        )
+        entries = get_funcs.get_storymap_entries(story_map_item)
+        self.assertTrue(len(entries) == 11)
+
     def test_get_url_host_name(self):
         url = "https://dbqa.mapsdevext.arcgis.com/home/content.html?view=list&sortOrder=desc&sortField=modified"
         host_name = get_funcs.get_url_host_name(url)

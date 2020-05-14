@@ -1,23 +1,49 @@
 import os
 import subprocess
 from arcgis import gis, mapping, features
-from arcgis.apps import storymap
 import requests
 import traceback
 from other.my_secrets import AGOL_DICT
 from pathlib import Path
 from GitHub.HelperScripts import convert_funcs, get_funcs
+from arcgis.apps.storymap import JournalStoryMap
+from other.my_secrets import get_regression_devext_dbqa_gis, AGOL_DICT
 
 HOME = str(Path.home())
+
+REGRESSION_GIS = get_regression_devext_dbqa_gis()
+NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
+PROD_URL_PARAM = AGOL_DICT["3X_URL_PARAM"]
+BETA_URL_PARAM = AGOL_DICT["4X_URL_PARAM"]
+
+
+def create_storymap_from_dashboards_using_pr(dashboard_items, pr_num, dashboard_type):
+    storymap = JournalStoryMap(gis=REGRESSION_GIS)
+    public_webmap = REGRESSION_GIS.content.get("c3d9f73238e34354a86239c4732c0524")
+    storymap.add(
+        title="Public Webmap", content="Public Webmap", url_or_item=public_webmap,
+    )
+    if dashboard_type == "3x":
+        for dashboard_item in dashboard_items:
+            storymap.add(
+                title=dashboard_item.title,
+                content=dashboard_item.title,
+                url_or_item="https://en.wikipedia.org/wiki/Apple",  # f"{NICKEL_BUILDER}/PR-{pr_num}/#/{dashboard_item.id}{PROD_URL_PARAM}"
+            )
+    else:
+        for dashboard_item in dashboard_items:
+            storymap.add(
+                title=dashboard_item.title,
+                url_or_item=f"{NICKEL_BUILDER}/PR-{pr_num}/dashboards/{dashboard_item.id}{BETA_URL_PARAM}",
+            )
+    storymap.save(title="Dashboard Embed Scenarios")
 
 
 def add_and_publish_file(
     gis_obj, file_path, file_type=None, agol_folder=None, title=None
 ) -> gis.Item:
 
-    if not title:
-        path_obj = Path(file_path)
-        title = path_obj.stem
+    title = Path(file_path).stem if not title else title
 
     item_prop = {"title": title, "type": file_type}
     item = gis_obj.content.add(

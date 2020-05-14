@@ -1,9 +1,20 @@
 from arcgis import features
 import os
+import re
 from pathlib import Path
 from arcgis.gis.server import Server
 from arcgis import gis, mapping
 from urllib.parse import urlparse
+
+
+def get_item_id_from_dashboard_url(dashboard_url):
+    item_id_pattern = re.compile("[0-9a-f]{32}")
+    return item_id_pattern.search(dashboard_url).group(0)
+
+
+def get_storymap_entries(storymap_item):
+    storymap_data = storymap_item.get_data()
+    return storymap_data["values"]["story"]["entries"]
 
 
 def get_url_host_name(url):

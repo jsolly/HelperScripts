@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 from arcgis import mapping, features
 from GitHub.HelperScripts import get_funcs
+from other.my_secrets import get_regression_devext_dbqa_gis
 
 
 def clone_folder(
@@ -176,5 +177,9 @@ def clone_ags_to_agol(gis_obj, feature_layer_url):
 
 
 if __name__ == "__main__":
-    SOURCE_FOLDER = "Embedded_Scenarios_3x"
-    TARGET_FOLDER = "Vis_Details"
+    # SOURCE_FOLDER = "Embedded_Scenarios_3x"
+    TARGET_FOLDER = "_Cloned"
+
+    REGRESSION_GIS = get_regression_devext_dbqa_gis()
+    STORY_MAP_ITEM = REGRESSION_GIS.content.get("e42f5e2ccddf46ecae9eff62fc18dcdc")
+    REGRESSION_GIS.content.clone_items(items=[STORY_MAP_ITEM], folder=TARGET_FOLDER)
