@@ -3,7 +3,6 @@ import subprocess
 from arcgis import gis, mapping, features
 import requests
 import traceback
-from other.my_secrets import AGOL_DICT
 from pathlib import Path
 from GitHub.HelperScripts import convert_funcs, get_funcs
 from arcgis.apps.storymap import JournalStoryMap
@@ -28,7 +27,7 @@ def create_storymap_from_dashboards_using_pr(dashboard_items, pr_num, dashboard_
             storymap.add(
                 title=dashboard_item.title,
                 content=dashboard_item.title,
-                url_or_item="https://en.wikipedia.org/wiki/Apple",  # f"{NICKEL_BUILDER}/PR-{pr_num}/#/{dashboard_item.id}{PROD_URL_PARAM}"
+                url_or_item=f"{NICKEL_BUILDER}/PR-{pr_num}/#/{dashboard_item.id}{PROD_URL_PARAM}",
             )
     else:
         for dashboard_item in dashboard_items:
@@ -170,11 +169,6 @@ def create_webmap_from_public_layer(agol_folder=None):
 
 def create_dashboard(gis_obj, dashboard_json_path, file_type="Dashboard"):
     add_and_publish_file(gis_obj, dashboard_json_path, file_type)
-
-
-def create_storymap_journal_with_dashboard_url(dashboard_url):
-    new_journal = storymap.JournalStoryMap()
-    new_journal.add(title="Dashboard", url_or_item=dashboard_url)
 
 
 def create_group_in_agol(gis_obj, group_name):

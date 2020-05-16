@@ -1,5 +1,7 @@
 import os
 import json
+import random
+import names
 from pathlib import PurePosixPath
 import argparse
 from pyproj import transform
@@ -197,6 +199,53 @@ def change_webmap_in_local_dashboard_json(dashboard_json_path, new_webmap_id):
     # save Dashboard JSON
 
 
+def add_feature_to_feature_layer(feature_layer_obj):
+    feature_set = feature_layer_obj.query()
+
+    feature = random.choice(feature_set.features)
+    feature_set._features = [feature]
+
+    feature_layer_obj.edit_features(adds=feature_set)
+
+
+def remove_feature_from_feature_layer(feature_layer_obj):
+    feature_set = feature_layer_obj.query()
+
+    feature_to_delete = random.choice(feature_set.features)
+    feature_set._features = [feature_to_delete]
+
+    feature_layer_obj.edit_features(deletes=feature_set)
+
+
+def modify_numeric_value(feature_layer_obj):
+    feature_set = feature_layer_obj.query()
+
+    modified_features = []
+    for _ in feature_set.features:
+        feature = random.choice(feature_set.features)
+
+        feature.attributes["int_field"] = random.randint(0, 100)
+        modified_features.append(feature)
+
+    feature_set._features = modified_features
+
+    feature_layer_obj.edit_features(updates=feature_set)
+
+
+def modify_string_value(feature_layer_obj):
+    feature_set = feature_layer_obj.query()
+
+    modified_features = []
+    for _ in feature_set.features:
+        feature = random.choice(feature_set.features)
+
+        feature.attributes["namefield"] = names.get_full_name()
+        modified_features.append(feature)
+    feature_set._features = modified_features
+
+    feature_layer_obj.edit_features(updates=feature_set)
+
+
 if __name__ == "__main__":
     # Get all of the commandline arguments
     parser = argparse.ArgumentParser("")
@@ -213,12 +262,12 @@ if __name__ == "__main__":
         url=args.org, username=args.username, password=args.password, verify_cert=False
     )
 
-    feature_layer = features.FeatureLayer(
+    FEATURE_LAYER_OBJ = features.FeatureLayer(
         url="https://servicesdev.arcgis.com/zImu9NfARSUcVsy1/ArcGIS/rest/services/5_Features/FeatureServer/0",
         gis=GIS_USER,
     )
 
-    remove_features_from_feature_layer(feature_layer, 7)
+    remove_features_from_feature_layer(FEATURE_LAYER_OBJ, 7)
 
     # feature_layer = features.FeatureLayer(gis=GIS_USER_1, url='')
     # delete_all_features(feature_layer=feature_layer)
@@ -241,54 +290,3 @@ if __name__ == "__main__":
     # delete_features_url = ""
     # response = requests.post(delete_features_url, params=parameters)
     # print(response)
-
-    # import random
-    # import time
-    # import names
-    #
-    #
-    # def add_feature_to_feature_layer(feature_layer):
-    #     feature_set = feature_layer.query()
-    #
-    #     feature = random.choice(feature_set.features)
-    #     feature_set._features = [feature]
-    #
-    #     feature_layer.edit_features(adds=feature_set)
-    #
-    #
-    # def remove_feature_from_feature_layer(feature_layer):
-    #     feature_set = feature_layer.query()
-    #
-    #     feature_to_delete = random.choice(feature_set.features)
-    #     feature_set._features = [feature_to_delete]
-    #
-    #     feature_layer.edit_features(deletes=feature_set)
-    #
-    #
-    # def modify_numeric_value(feature_layer):
-    #     feature_set = feature_layer.query()
-    #
-    #     modified_features = []
-    #     for feature in feature_set.features:
-    #         feature = random.choice(feature_set.features)
-    #
-    #         feature.attributes["int_field"] = random.randint(0, 100)
-    #         modified_features.append(feature)
-    #
-    #     feature_set._features = modified_features
-    #
-    #     feature_layer.edit_features(updates=feature_set)
-    #
-    #
-    # def modify_string_value(feature_layer):
-    #     feature_set = feature_layer.query()
-    #
-    #     modified_features = []
-    #     for feature in feature_set.features:
-    #         feature = random.choice(feature_set.features)
-    #
-    #         feature.attributes["namefield"] = names.get_full_name()
-    #         modified_features.append(feature)
-    #     feature_set._features = modified_features
-    #
-    #     feature_layer.edit_features(updates=feature_set)

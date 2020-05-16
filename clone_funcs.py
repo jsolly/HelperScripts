@@ -1,8 +1,8 @@
 from pathlib import Path
 import json
 from arcgis import mapping, features
-from GitHub.HelperScripts import get_funcs
-from other.my_secrets import get_regression_devext_dbqa_gis
+from GitHub.HelperScripts.get_funcs import get_items_from_folder
+from other.my_secrets import get_john_devext_gis, get_admin_prod_dbqa_gis
 
 
 def clone_folder(
@@ -50,7 +50,7 @@ def clone_group(
             search_existing_items=search_existing_items,
         )
 
-    target_folder_items = get_funcs.get_items_from_folder(
+    target_folder_items = get_items_from_folder(
         gis_obj=target_gis, folder=target_folder
     )
 
@@ -133,7 +133,7 @@ def download_all_item_json_from_agol_folder(
 ):  # "~/Downloads" mac laptop
 
     if Path(save_folder).is_dir():
-        items = get_funcs.get_items_from_folder(gis_obj=gis_obj, folder=agol_folder)
+        items = get_items_from_folder(gis_obj=gis_obj, folder=agol_folder)
         for item in items:
             download_item_json(item, save_folder=save_folder)
     else:
@@ -180,6 +180,7 @@ if __name__ == "__main__":
     # SOURCE_FOLDER = "Embedded_Scenarios_3x"
     TARGET_FOLDER = "_Cloned"
 
-    REGRESSION_GIS = get_regression_devext_dbqa_gis()
-    STORY_MAP_ITEM = REGRESSION_GIS.content.get("e42f5e2ccddf46ecae9eff62fc18dcdc")
-    REGRESSION_GIS.content.clone_items(items=[STORY_MAP_ITEM], folder=TARGET_FOLDER)
+    PROD_GIS = get_admin_prod_dbqa_gis()
+    DEV_GIS = get_john_devext_gis()
+    ITEM = PROD_GIS.content.get("8853fc6a503b4a949b7fa0b51fb48bb1")
+    DEV_GIS.content.clone_items(items=[ITEM], folder=TARGET_FOLDER)

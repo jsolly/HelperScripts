@@ -168,8 +168,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Logs
+# Logs and output
 logs/
+output/
+input/
 
 # Virtual Environments
 virtualenv/

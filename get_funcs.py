@@ -7,6 +7,11 @@ from arcgis import gis, mapping
 from urllib.parse import urlparse
 
 
+def count_lines_in_file(file_path):
+    with open(file_path) as my_file:
+        return sum(1 for _ in my_file)
+
+
 def get_item_id_from_dashboard_url(dashboard_url):
     item_id_pattern = re.compile("[0-9a-f]{32}")
     return item_id_pattern.search(dashboard_url).group(0)

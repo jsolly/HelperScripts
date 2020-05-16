@@ -74,3 +74,8 @@ class TestClass(unittest.TestCase):
             AGOL_ITEM_DICT["VERSION_27_DASHBOARD_JSON"], AUTOMATION_DEVEXT_DBQA_GIS
         )
         self.assertIsInstance(dashboard_item_data_sources[0], gis.Item)
+
+    def test_get_lines_in_file(self):
+        file_path = "../input/Date_with_string_date_time_2_0.csv"
+        line_count = get_funcs.count_lines_in_file(file_path)
+        self.assertEqual(line_count, 1000)

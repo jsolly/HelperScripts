@@ -2,20 +2,12 @@ import unittest
 from GitHub.HelperScripts import edit_funcs
 from arcgis import features
 from other.my_secrets import get_regression_devext_dbqa_gis
-
-REGRESSION_GIS = get_regression_devext_dbqa_gis()
+from other.my_secrets import AGOL_ITEM_DICT
 
 
 class TestClass(unittest.TestCase):
-    def test_update_item_data(self):
-        storymap_item = REGRESSION_GIS.content.get("d9e8b46c430e4a669e246b29fd341f13")
-        item_last_modified_date = storymap_item["modified"]
-        edit_funcs.update_item_data(storymap_item)
-        storymap_item_new = REGRESSION_GIS.content.get(
-            "d9e8b46c430e4a669e246b29fd341f13"
-        )
-        new_last_modified_date = storymap_item_new["modified"]
-        self.assertGreater(new_last_modified_date, item_last_modified_date)
+    REGRESSION_GIS = get_regression_devext_dbqa_gis()
+    FEATURE_LAYER = AGOL_ITEM_DICT["DEVEXT_FEATURE_LAYER_ITEM"]
 
     def test_add_feature_to_feature_layer(self):
         old_feature_count = self.FEATURE_LAYER.query(return_count_only=True)
