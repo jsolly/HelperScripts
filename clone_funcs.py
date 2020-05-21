@@ -2,7 +2,12 @@ from pathlib import Path
 import json
 from arcgis import mapping, features
 from GitHub.HelperScripts.get_funcs import get_items_from_folder
-from other.my_secrets import get_john_devext_gis, get_admin_prod_dbqa_gis
+from other.my_secrets import MySecrets
+
+MY_SECRETS = MySecrets()
+
+DEVEXT_GIS = MY_SECRETS.get_john_devext_gis()
+PROD_GIS = MY_SECRETS.get_admin_prod_dbqa_gis()
 
 
 def clone_folder(
@@ -179,8 +184,5 @@ def clone_ags_to_agol(gis_obj, feature_layer_url):
 if __name__ == "__main__":
     # SOURCE_FOLDER = "Embedded_Scenarios_3x"
     TARGET_FOLDER = "_Cloned"
-
-    PROD_GIS = get_admin_prod_dbqa_gis()
-    DEV_GIS = get_john_devext_gis()
     ITEM = PROD_GIS.content.get("8853fc6a503b4a949b7fa0b51fb48bb1")
-    DEV_GIS.content.clone_items(items=[ITEM], folder=TARGET_FOLDER)
+    DEVEXT_GIS.content.clone_items(items=[ITEM], folder=TARGET_FOLDER)

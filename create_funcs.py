@@ -6,17 +6,17 @@ import traceback
 from pathlib import Path
 from GitHub.HelperScripts import convert_funcs, get_funcs
 from arcgis.apps.storymap import JournalStoryMap
-from other.my_secrets import get_regression_devext_dbqa_gis, AGOL_DICT
+from other.my_secrets import MySecrets
 
-HOME = str(Path.home())
-
-REGRESSION_GIS = get_regression_devext_dbqa_gis()
+REGRESSION_GIS = MySecrets.get_regression_devext_dbqa_gis()
+AGOL_DICT = MySecrets.AGOL_DICT
 NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
-PROD_URL_PARAM = AGOL_DICT["3X_URL_PARAM"]
-BETA_URL_PARAM = AGOL_DICT["4X_URL_PARAM"]
+URL_PARAM = AGOL_DICT["URL_PARAM"]
 
 
-def create_storymap_from_dashboards_using_pr(dashboard_items, pr_num, dashboard_type):
+def create_storymap_from_dashboards_using_specific_build(
+    dashboard_items, build_name, dashboard_type
+) -> bool:
     storymap = JournalStoryMap(gis=REGRESSION_GIS)
     public_webmap = REGRESSION_GIS.content.get("c3d9f73238e34354a86239c4732c0524")
     storymap.add(
@@ -27,40 +27,34 @@ def create_storymap_from_dashboards_using_pr(dashboard_items, pr_num, dashboard_
             storymap.add(
                 title=dashboard_item.title,
                 content=dashboard_item.title,
-                url_or_item=f"{NICKEL_BUILDER}/PR-{pr_num}/#/{dashboard_item.id}{PROD_URL_PARAM}",
+                url_or_item=f"{NICKEL_BUILDER}/{build_name}/#/{dashboard_item.id}?{URL_PARAM}",
             )
     else:
         for dashboard_item in dashboard_items:
             storymap.add(
                 title=dashboard_item.title,
-                url_or_item=f"{NICKEL_BUILDER}/PR-{pr_num}/dashboards/{dashboard_item.id}{BETA_URL_PARAM}",
+                url_or_item=f"{NICKEL_BUILDER}/{build_name}/dashboards/{dashboard_item.id}#{URL_PARAM}",
             )
-    storymap.save(title="Dashboard Embed Scenarios")
+    return storymap.save(title=f"Dashboard Embed Scenarios with {build_name} urls")
 
 
-def add_and_publish_file(
-    gis_obj, file_path, file_type=None, agol_folder=None, title=None
-) -> gis.Item:
+def add_file_to_agol(gis_obj, file_path, agol_folder=None, title=None) -> gis.Item:
 
-    title = Path(file_path).stem if not title else title
+    file_path_parts = Path(file_path)
+    title = file_path_parts.stem if not title else title
+    file_type = file_path_parts.suffix[1:]
 
-    item_prop = {"title": title, "type": file_type}
+    item_prop = {"title": title, "file_type": file_type}
     item = gis_obj.content.add(
         item_properties=item_prop, data=file_path, folder=agol_folder
     )
-    if file_type != "Dashboard":
-        item = item.publish()
     return item
-
-
-def publish_items(items: list):
-    for item in items:
-        item.publish()
 
 
 def publish_items_in_folder(gis_obj, agol_folder):
     items = get_funcs.get_items_from_folders(gis_obj=gis_obj, folders=[agol_folder])
-    publish_items(items)
+    for item in items:
+        item.publish()
 
 
 def rest_publish_item(parameters: dict):
@@ -132,15 +126,11 @@ def create_webmap_from_feature_layer(feature_layer, agol_folder):
     return webmap_item
 
 
-def create_webmap_with_missing_layer_from_file(
-    gis_obj, file_type, file_path, agol_folder=None
-):
-    layer_item = add_and_publish_file(
-        gis_obj=gis_obj,
-        file_path=file_path,
-        file_type=file_type,
-        agol_folder=agol_folder,
+def create_webmap_with_missing_layer_from_file(gis_obj, file_path, agol_folder=None):
+    layer_item = add_file_to_agol(
+        gis_obj=gis_obj, file_path=file_path, agol_folder=agol_folder,
     )
+    layer_item.publish()
     webmap_item_properties = {
         "title": layer_item.title,
         "tags": "DashboardQA",
@@ -168,7 +158,7 @@ def create_webmap_from_public_layer(agol_folder=None):
 
 
 def create_dashboard(gis_obj, dashboard_json_path, file_type="Dashboard"):
-    add_and_publish_file(gis_obj, dashboard_json_path, file_type)
+    add_file_to_agol(gis_obj, dashboard_json_path, file_type)
 
 
 def create_group_in_agol(gis_obj, group_name):
@@ -178,21 +168,4 @@ def create_group_in_agol(gis_obj, group_name):
 if __name__ == "__main__":
     SOURCE_AGOL_FOLDER = "_Generic_Services"
     DESTINATION_AGOL_FOLDER = "Vis_Details"
-    FILE_PATH = f"{HOME}/Downloads/RedlandsCensusBlocksNearEsri.zip"
-
-    add_and_publish_file(
-        AGOL_DICT["REGRESSION_DEVEXT_DBQA_GIS"],
-        file_path=FILE_PATH,
-        file_type="File Geodatabase",
-        agol_folder=DESTINATION_AGOL_FOLDER,
-    )
-
-    # Add and publish a dashboard JSONS
-    # FILES = get_funcs.get_files_in_directory(LOCAL_DIRECTORY)
-    # for FILE in FILES:
-    # add_and_publish_file(
-    #     gis_obj=GIS_USER,
-    #     file_path=FILE._str,
-    #     file_type="Dashboard",
-    #     agol_folder="maxPaginationRecords",
-    # )
+    # FILE_PATH = f"{HOME}/Downloads/RedlandsCensusBlocksNearEsri.zip"

@@ -9,25 +9,25 @@ from arcgis import gis, features
 from GitHub.HelperScripts import get_funcs
 
 
-def update_item_data(item):
-    # item_properties = {"title": "I am a changed title"}
-    print(item.update(data="d9e8b46c430e4a669e246b29fd341f13.json"))
+def update_item_data(item, file_path) -> bool:
+    item_properties = {"type": "CSV"}
+    return item.update(item_properties=item_properties, data=file_path)
 
 
-# def add_type_keywords_to_item(item, type_keywords_to_be_added):
-#     final_type_keywords_diff = set(type_keywords_to_be_added).difference(
-#         set(item["type_keywords"])
-#     )
-#     final_type_keywords_string = "".join(
-#         item["type_keywords"], final_type_keywords_diff
-#     )
-#     item_properties = {"type_keywords": final_type_keywords_string}
-#     print(
-#         "I am adding type_keywords '{}' from item {}".format(
-#             type_keywords_to_be_added, item.title
-#         )
-#     )
-#     item.update(item_properties=item_properties)
+def add_type_keywords_to_item(item, type_keywords_to_be_added):
+    final_type_keywords_diff = set(type_keywords_to_be_added).difference(
+        set(item["type_keywords"])
+    )
+    final_type_keywords_string = "".join(
+        [item["type_keywords"], final_type_keywords_diff]
+    )
+    item_properties = {"type_keywords": final_type_keywords_string}
+    print(
+        "I am adding type_keywords '{}' from item {}".format(
+            type_keywords_to_be_added, item.title
+        )
+    )
+    item.update(item_properties=item_properties)
 
 
 #
