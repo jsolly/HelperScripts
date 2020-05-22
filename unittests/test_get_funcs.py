@@ -4,7 +4,7 @@ from GitHub.HelperScripts import get_funcs
 from other.my_secrets import MySecrets
 
 AGOL_ITEM_DICT = MySecrets.AGOL_DICT
-GIS_OBJ = MySecrets.get_regression_devext_dbqa_gis()
+GIS_OBJ = MySecrets.get_automation_devext_dbqa_gis()
 
 
 class TestClass(unittest.TestCase):

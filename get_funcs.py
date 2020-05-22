@@ -23,7 +23,8 @@ def get_storymap_entries(storymap_item):
 
 
 def get_url_host_name(url):
-    return urlparse(url).hostname
+    parsed_url = urlparse(url)
+    return f"{parsed_url.scheme}://{parsed_url.hostname}"
 
 
 def get_dashboard_version(dashboard_json):
