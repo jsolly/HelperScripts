@@ -8,7 +8,7 @@ from GitHub.HelperScripts import convert_funcs, get_funcs
 from arcgis.apps.storymap import JournalStoryMap
 from other.my_secrets import MySecrets
 
-REGRESSION_GIS = MySecrets.get_regression_devext_dbqa_gis()
+# GIS_OBJ = MySecrets.get_pr
 AGOL_DICT = MySecrets.AGOL_DICT
 NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
 URL_PARAM = AGOL_DICT["URL_PARAM"]
@@ -17,38 +17,47 @@ URL_PARAM = AGOL_DICT["URL_PARAM"]
 def create_storymap_from_dashboards_using_specific_build(
     dashboard_items, build_name, dashboard_type
 ) -> bool:
-    storymap = JournalStoryMap(gis=REGRESSION_GIS)
-    public_webmap = REGRESSION_GIS.content.get("c3d9f73238e34354a86239c4732c0524")
+    storymap = JournalStoryMap(gis=GIS_OBJ)
+    public_webmap = GIS_OBJ.content.get("c3d9f73238e34354a86239c4732c0524")
     storymap.add(
-        title="Public Webmap", content="Public Webmap", url_or_item=public_webmap,
+        title=f"Dashboard Embed Scenarios with {build_name} urls",
+        content="Public Webmap",
+        url_or_item=public_webmap,
     )
-    if dashboard_type == "3x":
-        for dashboard_item in dashboard_items:
-            storymap.add(
-                title=dashboard_item.title,
-                content=dashboard_item.title,
-                url_or_item=f"{NICKEL_BUILDER}/{build_name}/#/{dashboard_item.id}?{URL_PARAM}",
-            )
-    else:
-        for dashboard_item in dashboard_items:
-            storymap.add(
-                title=dashboard_item.title,
-                url_or_item=f"{NICKEL_BUILDER}/{build_name}/dashboards/{dashboard_item.id}#{URL_PARAM}",
-            )
+    for dashboard_item in dashboard_items:
+        dashboard_url = (
+            f"{NICKEL_BUILDER}/{build_name}/#/{dashboard_item.id}?{URL_PARAM}"
+        )
+
+        if dashboard_type == "4x":
+            dashboard_url = f"{NICKEL_BUILDER}/{build_name}/dashboards/{dashboard_item.id}#{URL_PARAM}"
+
+        storymap.add(
+            title=dashboard_item.title,
+            content=dashboard_item.title,
+            url_or_item=dashboard_url,
+        )
+
     return storymap.save(title=f"Dashboard Embed Scenarios with {build_name} urls")
 
 
 def add_file_to_agol(gis_obj, file_path, agol_folder=None, title=None) -> gis.Item:
 
+    item_types = {"csv": "csv", "zip": "File Geodatabase", "json": "Dashboard"}
+
     file_path_parts = Path(file_path)
     title = file_path_parts.stem if not title else title
-    file_type = file_path_parts.suffix[1:]
+    file_type = item_types[file_path_parts.suffix[1:]]
 
     item_prop = {"title": title, "file_type": file_type}
-    item = gis_obj.content.add(
-        item_properties=item_prop, data=file_path, folder=agol_folder
-    )
-    return item
+    try:
+        item = gis_obj.content.add(
+            item_properties=item_prop, data=file_path, folder=agol_folder
+        )
+        return item
+
+    except:
+        pass
 
 
 def publish_items_in_folder(gis_obj, agol_folder):
