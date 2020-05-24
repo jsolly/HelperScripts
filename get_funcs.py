@@ -5,14 +5,22 @@ from pathlib import Path
 from arcgis.gis.server import Server
 from arcgis import gis, mapping
 from urllib.parse import urlparse
+import time
 
 
-def count_lines_in_file(file_path):
+def get_func_run_time(func, *args):
+    t1 = time.perf_counter_ns()
+    func(args)
+    t2 = time.perf_counter_ns()
+    return t2 - t1
+
+
+def count_lines_in_file(file_path) -> int:
     with open(file_path) as my_file:
         return sum(1 for _ in my_file)
 
 
-def get_item_id_from_dashboard_url(dashboard_url):
+def get_item_id_from_dashboard_url(dashboard_url) -> str:
     item_id_pattern = re.compile("[0-9a-f]{32}")
     return item_id_pattern.search(dashboard_url).group(0)
 
@@ -22,12 +30,12 @@ def get_storymap_entries(storymap_item):
     return storymap_data["values"]["story"]["entries"]
 
 
-def get_url_host_name(url):
+def get_url_host_name(url) -> str:
     parsed_url = urlparse(url)
     return f"{parsed_url.scheme}://{parsed_url.hostname}"
 
 
-def get_dashboard_version(dashboard_json):
+def get_dashboard_version(dashboard_json) -> int:
     if dashboard_json != {} and dashboard_json is not None:
         if dashboard_json != {"_ssl": False}:  # Why is this happening?
             return dashboard_json["version"]
@@ -215,7 +223,7 @@ def get_service_credential(
 #         return FeatureLayer(feature_service_url, gis=gis_obj)
 
 
-def get_folder_names(gis_obj):
+def get_folder_names(gis_obj) -> list:
     return gis_obj.users.me.folders
 
 
@@ -234,11 +242,11 @@ def get_feature_layer_extent(feature_layer, out_sr):
     return feature_layer.query(return_extent_only=True, out_sr=out_sr)["extent"]
 
 
-def get_feature_count_from_feature_layer(feature_layer):
+def get_feature_count_from_feature_layer(feature_layer) -> int:
     return feature_layer.query(return_count_only=True)
 
 
-def get_files_in_directory(directory=None, extension=None):
+def get_files_in_directory(directory=None, extension=None) -> list:
     if directory is None:  # Loop current directory if one isn't provided
         directory = os.getcwd()
 

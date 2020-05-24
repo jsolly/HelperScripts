@@ -13,7 +13,7 @@ from GitHub.HelperScripts import get_funcs
 from GitHub.HelperScripts import edit_funcs
 
 
-def convert_box_note(boxnote_path):
+def convert_box_note_to_markdown(boxnote_path):
     filename = os.path.basename(boxnote_path).split(".")[0]
     note = BoxNote.from_file(boxnote_path)
     markdown = note.as_markdown()  # returns a markdown strings
@@ -22,7 +22,7 @@ def convert_box_note(boxnote_path):
         writer_obj.write(markdown)
 
 
-def csv_from_excel(xls_path):
+def excel_to_csv(xls_path):
     filename = os.path.basename(xls_path).split(".")[0]
     data_xls = pd.read_excel(xls_path)
     data_xls.to_csv(filename + ".csv", encoding="utf-8")

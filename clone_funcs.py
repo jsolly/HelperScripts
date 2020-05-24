@@ -63,7 +63,7 @@ def clone_group(
         item.share(groups=[target_group])
 
 
-def weak_clone_items(items: list, target_gis, target_folder, flip_https):
+def weak_clone_items(items: list, target_gis, target_folder, flip_https: bool):
     for item in items:
         if not item.url:
             return

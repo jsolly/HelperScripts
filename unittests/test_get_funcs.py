@@ -8,8 +8,16 @@ GIS_OBJ = MySecrets.get_automation_devext_dbqa_gis()
 
 
 class TestClass(unittest.TestCase):
+    def test_get_func_time(self):
+        def square(a, b):
+            return a * b
+
+        a, b = 2, 2
+        run_time = get_funcs.get_func_run_time(square, a, b)
+        self.assertIsInstance(run_time, int)
+
     def test_get_item_id_from_dashboard_url(self):
-        url = "https://devext.arcgis.com/apps/opsdashboard/index.html#/461ac62237774768bb40bca2b2b4c867"
+        url = "https://devext.arcgis.com/apps/opsdashboard/index.html#/461ac62237774768bb40bca2b2b4c867"  # todo: remove url
         item_id = get_funcs.get_item_id_from_dashboard_url(url)
         self.assertEqual(item_id, "461ac62237774768bb40bca2b2b4c867")
 
