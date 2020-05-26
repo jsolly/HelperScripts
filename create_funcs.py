@@ -8,21 +8,20 @@ from GitHub.HelperScripts import convert_funcs, get_funcs
 from arcgis.apps.storymap import JournalStoryMap
 from other.my_secrets import MySecrets
 
-# GIS_OBJ = MySecrets.get_pr
+GIS_OBJ = MySecrets.get_regression_prod_dbqa_gis()
 AGOL_DICT = MySecrets.AGOL_DICT
 NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
-URL_PARAM = AGOL_DICT["URL_PARAM"]
+URL_PARAM = AGOL_DICT["DEV_URL_PARAM"]
 
 
 def create_storymap_from_dashboards_using_specific_build(
     dashboard_items, build_name, dashboard_type
 ) -> bool:
     storymap = JournalStoryMap(gis=GIS_OBJ)
-    public_webmap = GIS_OBJ.content.get("c3d9f73238e34354a86239c4732c0524")
     storymap.add(
         title=f"Dashboard Embed Scenarios with {build_name} urls",
-        content="Public Webmap",
-        url_or_item=public_webmap,
+        content="Example Website",
+        url_or_item="https://www.example.com",
     )
     for dashboard_item in dashboard_items:
         dashboard_url = (
@@ -178,3 +177,14 @@ if __name__ == "__main__":
     SOURCE_AGOL_FOLDER = "_Generic_Services"
     DESTINATION_AGOL_FOLDER = "Vis_Details"
     # FILE_PATH = f"{HOME}/Downloads/RedlandsCensusBlocksNearEsri.zip"
+    URL_PARAM = AGOL_DICT["PROD_URL_PARAM"]
+
+    dashboard_items = get_funcs.get_items_from_folder(
+        GIS_OBJ, "Sharing_Options", item_types=["Dashboard"]
+    )
+    build_name = "release-10.8.1"
+    dashboard_type = "3x"
+
+    create_storymap_from_dashboards_using_specific_build(
+        dashboard_items, build_name, dashboard_type
+    )
