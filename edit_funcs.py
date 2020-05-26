@@ -3,10 +3,41 @@ import json
 import random
 import names
 from pathlib import PurePosixPath
-import argparse
 from pyproj import transform
 from arcgis import gis, features
-from GitHub.HelperScripts import get_funcs
+from GitHub.HelperScripts import get_funcs, create_funcs
+from other.my_secrets import MySecrets
+
+GIS_OBJ = MySecrets.get_regression_prod_dbqa_gis()
+AGOL_DICT = MySecrets.AGOL_DICT
+NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
+URL_PARAM = AGOL_DICT["DEV_URL_PARAM"]
+
+
+def add_dashboard_sections_to_storymap(
+    storymap_obj, dashboard_items: list, build_name, build_type, url_params=None
+):
+    dashboard_url_dict = {
+        "3x_NICKEL_BUILDER": f"{NICKEL_BUILDER}/{build_name}/#",
+        "4x_NICKEL_BUILDER": f"{NICKEL_BUILDER}/{build_name}/dashboards",
+        "PROD": AGOL_DICT["PROD_ENV"],
+        "DEV": AGOL_DICT["DEV_ENV"],
+    }
+    storymap_obj.add(
+        title=f"Dashboard Embed Scenarios",
+        content="Example Website",
+        url_or_item="https://www.example.com",
+    )
+    url_params = "" if not url_params else url_params
+
+    for dashboard_item in dashboard_items:
+        storymap_obj.add(
+            title=f"{dashboard_item.title} {build_name}",
+            content=f"{dashboard_item.title} {build_name}",
+            url_or_item=f"{dashboard_url_dict[build_type]}/{dashboard_item.id}{url_params}",
+        )
+
+    return storymap_obj
 
 
 def update_item_data(item, file_path) -> bool:
@@ -244,49 +275,3 @@ def modify_string_value(feature_layer_obj):
     feature_set._features = modified_features
 
     feature_layer_obj.edit_features(updates=feature_set)
-
-
-if __name__ == "__main__":
-    # Get all of the commandline arguments
-    parser = argparse.ArgumentParser("")
-    parser.add_argument("-org", dest="org", help="", required=True)
-    parser.add_argument(
-        "-username", dest="username", help="The username of the portal", required=True
-    )
-    parser.add_argument(
-        "-password", dest="password", help="The associated password", required=True
-    )
-    args = parser.parse_args()
-
-    GIS_USER = gis.GIS(
-        url=args.org, username=args.username, password=args.password, verify_cert=False
-    )
-
-    FEATURE_LAYER_OBJ = features.FeatureLayer(
-        url="https://servicesdev.arcgis.com/zImu9NfARSUcVsy1/ArcGIS/rest/services/5_Features/FeatureServer/0",
-        gis=GIS_USER,
-    )
-
-    remove_features_from_feature_layer(FEATURE_LAYER_OBJ, 7)
-
-    # feature_layer = features.FeatureLayer(gis=GIS_USER_1, url='')
-    # delete_all_features(feature_layer=feature_layer)
-
-    # add_file_extensions(folder_path="~/Downloads", extension="json")
-
-    # Delete an Item
-    # item = gis.Item(GIS_USER, "")
-    # item.delete()
-
-    # layer = features.FeatureLayer(url="", gis=GIS_USER)
-    # print(layer.delete_features(where="unitname is null"))
-
-    # parameters = {'where':'1=1', 'returnExtentOnly':'true', 'f':'pjson'}
-    # query_url = ""
-    # response = requests.get(query_url, params=parameters)
-    # print(response.text)
-
-    # parameters = {"where":"UnitName=Null"}
-    # delete_features_url = ""
-    # response = requests.post(delete_features_url, params=parameters)
-    # print(response)

@@ -14,32 +14,6 @@ NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
 URL_PARAM = AGOL_DICT["DEV_URL_PARAM"]
 
 
-def create_storymap_from_dashboards_using_specific_build(
-    dashboard_items, build_name, dashboard_type
-) -> bool:
-    storymap = JournalStoryMap(gis=GIS_OBJ)
-    storymap.add(
-        title=f"Dashboard Embed Scenarios with {build_name} urls",
-        content="Example Website",
-        url_or_item="https://www.example.com",
-    )
-    for dashboard_item in dashboard_items:
-        dashboard_url = (
-            f"{NICKEL_BUILDER}/{build_name}/#/{dashboard_item.id}?{URL_PARAM}"
-        )
-
-        if dashboard_type == "4x":
-            dashboard_url = f"{NICKEL_BUILDER}/{build_name}/dashboards/{dashboard_item.id}#{URL_PARAM}"
-
-        storymap.add(
-            title=dashboard_item.title,
-            content=dashboard_item.title,
-            url_or_item=dashboard_url,
-        )
-
-    return storymap.save(title=f"Dashboard Embed Scenarios with {build_name} urls")
-
-
 def add_file_to_agol(gis_obj, file_path, agol_folder=None, title=None) -> gis.Item:
 
     item_types = {"csv": "csv", "zip": "File Geodatabase", "json": "Dashboard"}
