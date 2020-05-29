@@ -4,20 +4,37 @@ from GitHub.HelperScripts import get_funcs
 from other.my_secrets import MySecrets
 
 AGOL_ITEM_DICT = MySecrets.AGOL_DICT
-GIS_OBJ = MySecrets.get_automation_devext_dbqa_gis()
+GIS_OBJ = ""  # todo: fix me
+AGOL_DICT = MySecrets.AGOL_DICT
 
 
 class TestClass(unittest.TestCase):
+    def test_get_items_from_group(self):
+        items = get_funcs.get_items_from_group(
+            gis_obj=GIS_OBJ, group_id="74675128c9e84b5ca3874b40df5662c6",
+        )
+        self.assertIsInstance(items, list)
+
+    def test_get_file_line_count_python(self):
+        file_path = "../input/covid_modified.csv"
+        line_count = get_funcs.get_file_line_count_python(file_path)
+        self.assertEqual(line_count, 50)
+
+    def test_get_file_line_count_bash(self):
+        file_path = "../input/covid_modified.csv"
+        line_count = get_funcs.get_file_line_count_bash(file_path)
+        self.assertEqual(line_count, 50)
+
     def test_get_func_time(self):
-        def square(a, b):
-            return a * b
+        def square(x, y):
+            return x * y
 
         a, b = 2, 2
         run_time = get_funcs.get_func_run_time(square, a, b)
         self.assertIsInstance(run_time, int)
 
     def test_get_item_id_from_dashboard_url(self):
-        url = "https://devext.arcgis.com/apps/opsdashboard/index.html#/461ac62237774768bb40bca2b2b4c867"  # todo: remove url
+        url = f"{AGOL_DICT['DEV_ENV']}/apps/opsdashboard/index.html#/461ac62237774768bb40bca2b2b4c867"
         item_id = get_funcs.get_item_id_from_dashboard_url(url)
         self.assertEqual(item_id, "461ac62237774768bb40bca2b2b4c867")
 
@@ -27,9 +44,9 @@ class TestClass(unittest.TestCase):
         self.assertTrue(len(entries) == 11)
 
     def test_get_url_host_name(self):
-        url = "https://dbqa.mapsdevext.arcgis.com/home/content.html?view=list&sortOrder=desc&sortField=modified"
+        url = f"{AGOL_DICT['DEV_ENV']}/home/content.html?view=list&sortOrder=desc&sortField=modified"
         host_name = get_funcs.get_url_host_name(url)
-        self.assertEqual(host_name, "dbqa.mapsdevext.arcgis.com")
+        self.assertEqual(host_name, AGOL_DICT["DEV_ENV"])
 
     def test_get_dashboard_version(self):
 
@@ -77,8 +94,3 @@ class TestClass(unittest.TestCase):
             AGOL_ITEM_DICT["VERSION_27_DASHBOARD_JSON"], GIS_OBJ
         )
         self.assertIsInstance(dashboard_item_data_sources[0], gis.Item)
-
-    def test_get_lines_in_file(self):
-        file_path = "../input/Date_with_string_date_time_2_0.csv"
-        line_count = get_funcs.count_lines_in_file(file_path)
-        self.assertEqual(line_count, 1000)

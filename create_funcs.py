@@ -5,10 +5,10 @@ import requests
 import traceback
 from pathlib import Path
 from GitHub.HelperScripts import convert_funcs, get_funcs
-from arcgis.apps.storymap import JournalStoryMap
 from other.my_secrets import MySecrets
+from arcgis.apps.storymap import JournalStoryMap
 
-GIS_OBJ = MySecrets.get_regression_prod_dbqa_gis()
+# GIS_OBJ = MySecrets.get_agol_gis(user=)
 AGOL_DICT = MySecrets.AGOL_DICT
 NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
 URL_PARAM = AGOL_DICT["DEV_URL_PARAM"]
@@ -23,14 +23,11 @@ def add_file_to_agol(gis_obj, file_path, agol_folder=None, title=None) -> gis.It
     file_type = item_types[file_path_parts.suffix[1:]]
 
     item_prop = {"title": title, "file_type": file_type}
-    try:
-        item = gis_obj.content.add(
-            item_properties=item_prop, data=file_path, folder=agol_folder
-        )
-        return item
 
-    except:
-        pass
+    item = gis_obj.content.add(
+        item_properties=item_prop, data=file_path, folder=agol_folder
+    )
+    return item
 
 
 def publish_items_in_folder(gis_obj, agol_folder):
@@ -145,20 +142,3 @@ def create_dashboard(gis_obj, dashboard_json_path, file_type="Dashboard"):
 
 def create_group_in_agol(gis_obj, group_name):
     gis_obj.groups.create(title=group_name, tags="DashboardQA")
-
-
-if __name__ == "__main__":
-    SOURCE_AGOL_FOLDER = "_Generic_Services"
-    DESTINATION_AGOL_FOLDER = "Vis_Details"
-    # FILE_PATH = f"{HOME}/Downloads/RedlandsCensusBlocksNearEsri.zip"
-    URL_PARAM = AGOL_DICT["PROD_URL_PARAM"]
-
-    dashboard_items = get_funcs.get_items_from_folder(
-        GIS_OBJ, "Sharing_Options", item_types=["Dashboard"]
-    )
-    build_name = "release-10.8.1"
-    dashboard_type = "3x"
-
-    create_storymap_from_dashboards_using_specific_build(
-        dashboard_items, build_name, dashboard_type
-    )

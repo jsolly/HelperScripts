@@ -4,12 +4,13 @@ import random
 import names
 from pathlib import PurePosixPath
 from pyproj import transform
-from arcgis import gis, features
-from GitHub.HelperScripts import get_funcs, create_funcs
+from arcgis import features
+from GitHub.HelperScripts import get_funcs
 from other.my_secrets import MySecrets
 
-GIS_OBJ = MySecrets.get_regression_prod_dbqa_gis()
+# GIS_OBJ = MySecrets.get_regression_prod_dbqa_gis()
 AGOL_DICT = MySecrets.AGOL_DICT
+PORTAL_DICT = MySecrets.PORTAL_DICT
 NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
 URL_PARAM = AGOL_DICT["DEV_URL_PARAM"]
 
@@ -22,6 +23,7 @@ def add_dashboard_sections_to_storymap(
         "4x_NICKEL_BUILDER": f"{NICKEL_BUILDER}/{build_name}/dashboards",
         "PROD": AGOL_DICT["PROD_ENV"],
         "DEV": AGOL_DICT["DEV_ENV"],
+        "MY_PORTAL": PORTAL_DICT["MY_PORTAL"],
     }
     storymap_obj.add(
         title=f"Dashboard Embed Scenarios",

@@ -6,6 +6,18 @@ from arcgis.gis.server import Server
 from arcgis import gis, mapping
 from urllib.parse import urlparse
 import time
+import subprocess
+
+
+def get_items_from_group(gis_obj, group_id, item_types=None):
+    group = gis.Group(gis=gis_obj, groupid=group_id)
+    items = group.content()  # max_items=1000
+
+    if item_types:
+        filtered_items = [item for item in items if item.type in item_types]
+        return filtered_items
+
+    return items
 
 
 def get_func_run_time(func, *args):
@@ -15,9 +27,16 @@ def get_func_run_time(func, *args):
     return t2 - t1
 
 
-def count_lines_in_file(file_path) -> int:
+def get_file_line_count_python(file_path) -> int:
     with open(file_path) as my_file:
         return sum(1 for _ in my_file)
+
+
+def get_file_line_count_bash(file_path):
+    line_count = subprocess.run(
+        [f"cat {file_path} | wc -l"], capture_output=True, text=True, shell=True
+    )
+    return int(line_count.stdout.strip())
 
 
 def get_item_id_from_dashboard_url(dashboard_url) -> str:
@@ -35,7 +54,7 @@ def get_url_host_name(url) -> str:
     return f"{parsed_url.scheme}://{parsed_url.hostname}"
 
 
-def get_dashboard_version(dashboard_json) -> int:
+def get_dashboard_version(dashboard_json):
     if dashboard_json != {} and dashboard_json is not None:
         if dashboard_json != {"_ssl": False}:  # Why is this happening?
             return dashboard_json["version"]

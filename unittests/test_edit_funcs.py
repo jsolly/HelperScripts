@@ -4,7 +4,7 @@ from arcgis import features
 from other.my_secrets import MySecrets
 from arcgis.apps.storymap import JournalStoryMap
 
-GIS_OBJ = MySecrets.get_automation_devext_dbqa_gis()
+GIS_OBJ = ""  # todo: this needs to be fixed
 AGOL_DICT = MySecrets.AGOL_DICT
 AGOL_ITEM_DICT = MySecrets.AGOL_ITEM_DICT
 FEATURE_LAYER = AGOL_ITEM_DICT["DEVEXT_FEATURE_LAYER_ITEM"]
