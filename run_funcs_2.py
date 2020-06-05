@@ -1,22 +1,24 @@
 from other.my_secrets import MySecrets
-from GitHub.HelperScripts import create_funcs
+from GitHub.HelperScripts import create_funcs, clone_funcs
 
-# PROD_GIS = MySecrets.get_agol_gis(environment="PROD_ENV", user="DBQA_REGRESSION")
-# DEV_GIS = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_REGRESSION")
-AUTOMATION_GIS = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
+GIS = MySecrets.get_agol_gis(environment="PROD_ENV", user="DBQA_REGRESSION")
+# GIS = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_REGRESSION")
+# GIS = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
 # BUILT_IN_GIS = MySecrets.get_portal_gis(environment="BUILT-IN_ENV", user="CREATOR")
-TARGET_FOLDER = "TEMP"
+TARGET_FOLDER = "Arcade"
 
 
 # Clone an item
 # item = PROD_GIS.content.get("320f70a2535841a3a326e964dc78a66b")
 # DEV_GIS.content.clone_items(items=[item], folder=TARGET_FOLDER)
 
-new_item = create_funcs.add_file_to_agol(
-    gis_obj=AUTOMATION_GIS,
-    file_path="../../../Data/FGBs/Emergency_Facilities.zip",
-    agol_folder=TARGET_FOLDER,
-    title="test",
+
+# Clone a group
+clone_funcs.clone_group_to_folder(
+    source_group_id="dfe07fe13d154b67bbd7a38a2be90fd9",
+    target_folder=TARGET_FOLDER,
+    source_gis_obj=GIS,
+    target_gis_obj=GIS,
+    copy_data=False,
+    item_types=["Web Map"],
 )
-new_item.share(org=True)  # todo: figure out how publishing sharing works
-new_item.publish()

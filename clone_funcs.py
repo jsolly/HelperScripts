@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 from arcgis import mapping, features
-from GitHub.HelperScripts.get_funcs import get_items_from_folder
+from GitHub.HelperScripts import get_funcs
 from other.my_secrets import MySecrets
 
 
@@ -36,31 +36,30 @@ def clone_folder(
             raise Exception("I have no idea about this error")
 
 
-def clone_group(
-    source_group,
-    target_group,
+def clone_group_to_folder(
+    source_group_id,
     target_folder,
-    source_gis,
-    target_gis,
+    source_gis_obj,
+    target_gis_obj,
     search_existing_items=True,
+    copy_data=True,
+    item_types=None,
 ):
-    source_group_items = source_gis.groups.search(query=source_group)[0].content()
-    target_group = target_gis.groups.search(query=target_group)[0]
+    source_group_items = get_funcs.get_items_from_group(
+        source_gis_obj, source_group_id, item_types=item_types
+    )
 
     for item in source_group_items:
-        target_gis.content.clone_items(
+        target_gis_obj.content.clone_items(
             items=[item],
             folder=target_folder,
-            copy_data=True,
+            copy_data=copy_data,
             search_existing_items=search_existing_items,
         )
 
-    target_folder_items = get_items_from_folder(
-        gis_obj=target_gis, folder=target_folder
-    )
 
-    for item in target_folder_items:
-        item.share(groups=[target_group])
+def clone_group_to_group():
+    print("TODO")
 
 
 def weak_clone_items(items: list, target_gis, target_folder, flip_https: bool):
@@ -138,7 +137,7 @@ def download_all_item_json_from_agol_folder(
 ):  # "~/Downloads" mac laptop
 
     if Path(save_folder).is_dir():
-        items = get_items_from_folder(gis_obj=gis_obj, folder=agol_folder)
+        items = get_funcs.get_items_from_folder(gis_obj=gis_obj, folder=agol_folder)
         for item in items:
             download_item_json(item, save_folder=save_folder)
     else:

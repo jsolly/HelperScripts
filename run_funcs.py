@@ -14,8 +14,8 @@ DASHBOARD_ITEMS = get_funcs.get_items_from_folder(
     GIS, "Sharing_Options", item_types=["Dashboard"]
 )
 
-BUILD_NAME = "release-10.8.1"
-BUILD_TYPE = "3x_NICKEL_BUILDER"
+BUILD_NAME = "3x Devext"
+BUILD_TYPE = "3X_DEV"
 # STORYMAP_ITEM = GIS.content.get("b6d09fc5da5a470fb717a5faecb283ba")
 STORYMAP_OBJ = JournalStoryMap(gis=GIS)  # item=STORYMAP_ITEM if using an existing item
 edit_funcs.add_dashboard_sections_to_storymap(
@@ -25,4 +25,6 @@ edit_funcs.add_dashboard_sections_to_storymap(
     build_type=BUILD_TYPE,
     url_params="DEV_URL_PARAM",
 )
-STORYMAP_OBJ.save(title=f"Dashboard Embed Scenarios with {BUILD_NAME} urls")
+STORYMAP_OBJ.save(
+    title=f"Dashboard Embed Scenarios with {BUILD_NAME} urls (useParentOriginFix)"
+)

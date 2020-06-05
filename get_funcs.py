@@ -10,14 +10,15 @@ import subprocess
 
 
 def get_items_from_group(gis_obj, group_id, item_types=None):
-    group = gis.Group(gis=gis_obj, groupid=group_id)
-    items = group.content()  # max_items=1000
+    group_items = gis_obj.groups.get(
+        "dfe07fe13d154b67bbd7a38a2be90fd9"
+    ).content()  # max_items=1000
 
     if item_types:
-        filtered_items = [item for item in items if item.type in item_types]
+        filtered_items = [item for item in group_items if item.type in item_types]
         return filtered_items
 
-    return items
+    return group_items
 
 
 def get_func_run_time(func, *args):
