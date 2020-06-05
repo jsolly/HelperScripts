@@ -4,7 +4,6 @@ from GitHub.HelperScripts import get_funcs
 from other.my_secrets import MySecrets
 
 AGOL_ITEM_DICT = MySecrets.AGOL_DICT
-GIS_OBJ = ""  # todo: fix me
 AGOL_DICT = MySecrets.AGOL_DICT
 
 
@@ -44,7 +43,7 @@ class TestClass(unittest.TestCase):
         self.assertTrue(len(entries) == 11)
 
     def test_get_url_host_name(self):
-        url = f"{AGOL_DICT['DEV_ENV']}/home/content.html?view=list&sortOrder=desc&sortField=modified"
+        url = f"{https://AGOL_DICT['DEV_ENV']}/home/content.html?view=list&sortOrder=desc&sortField=modified"
         host_name = get_funcs.get_url_host_name(url)
         self.assertEqual(host_name, AGOL_DICT["DEV_ENV"])
 
@@ -61,7 +60,7 @@ class TestClass(unittest.TestCase):
 
     def test_get_items_from_folders(self):
         items = get_funcs.get_items_from_folders(
-            GIS_OBJ, ["Sample_Dashboards", "Five Items"]
+            self.GIS_OBJ, ["Sample_Dashboards", "Five Items"]
         )
         self.assertEqual(len(items), 7)
 

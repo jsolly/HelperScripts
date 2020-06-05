@@ -12,7 +12,6 @@ from other.my_secrets import MySecrets
 AGOL_DICT = MySecrets.AGOL_DICT
 PORTAL_DICT = MySecrets.PORTAL_DICT
 NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
-URL_PARAM = AGOL_DICT["DEV_URL_PARAM"]
 
 
 def add_dashboard_sections_to_storymap(
@@ -21,7 +20,6 @@ def add_dashboard_sections_to_storymap(
     dashboard_url_dict = {
         "3x_NICKEL_BUILDER": f"{NICKEL_BUILDER}/{build_name}/#",
         "4x_NICKEL_BUILDER": f"{NICKEL_BUILDER}/{build_name}/dashboards",
-        "PROD": AGOL_DICT["PROD_ENV"],
         "DEV": AGOL_DICT["DEV_ENV"],
         "MY_PORTAL": PORTAL_DICT["MY_PORTAL"],
     }
@@ -30,13 +28,16 @@ def add_dashboard_sections_to_storymap(
         content="Example Website",
         url_or_item="https://www.example.com",
     )
-    url_params = "" if not url_params else url_params
+    url_params = "" if not url_params else AGOL_DICT[url_params]
 
     for dashboard_item in dashboard_items:
+        parameter_seperator = "?" if "3x" in build_type else "#"
+        dashboard_url = f"https://{dashboard_url_dict[build_type]}/{dashboard_item.id}{parameter_seperator}{url_params}"
+
         storymap_obj.add(
             title=f"{dashboard_item.title} {build_name}",
             content=f"{dashboard_item.title} {build_name}",
-            url_or_item=f"{dashboard_url_dict[build_type]}/{dashboard_item.id}{url_params}",
+            url_or_item=dashboard_url,
         )
 
     return storymap_obj

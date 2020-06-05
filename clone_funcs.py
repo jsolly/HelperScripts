@@ -5,10 +5,6 @@ from GitHub.HelperScripts.get_funcs import get_items_from_folder
 from other.my_secrets import MySecrets
 
 
-DEV_GIS = ""
-PROD_GIS = ""
-
-
 def clone_folder(
     source_folder,
     target_folder,
@@ -26,13 +22,18 @@ def clone_folder(
             if item.type in ignore_item_type:
                 items_list.remove(item)
 
-        for item in items_list:
+    for item in items_list:
+        try:
             target_gis.content.clone_items(
                 items=[item],
                 folder=target_folder,
                 copy_data=copy_data,
                 search_existing_items=search_existing_items,
             )
+        except Exception as e:
+            if e.args[0].startswith("Item does not exist"):
+                continue
+            raise Exception("I have no idea about this error")
 
 
 def clone_group(
@@ -181,7 +182,14 @@ def clone_ags_to_agol(gis_obj, feature_layer_url):
 
 
 if __name__ == "__main__":
-    # SOURCE_FOLDER = "Embedded_Scenarios_3x"
-    TARGET_FOLDER = "_Cloned"
-    ITEM = PROD_GIS.content.get("8853fc6a503b4a949b7fa0b51fb48bb1")
-    DEV_GIS.content.clone_items(items=[ITEM], folder=TARGET_FOLDER)
+    SOURCE_FOLDER = "Sharing_Options"
+    TARGET_FOLDER = "Sharing_Options"
+
+    GIS_1 = MySecrets.get_agol_gis("DEV_ENV", "DBQA_REGRESSION")
+    GIS_2 = MySecrets.get_portal_gis("SAML_ENV", "CREATOR")
+    clone_folder(
+        source_folder=SOURCE_FOLDER,
+        target_folder=TARGET_FOLDER,
+        source_gis=GIS_1,
+        target_gis=GIS_2,
+    )

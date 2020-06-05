@@ -6,7 +6,6 @@ import traceback
 from pathlib import Path
 from GitHub.HelperScripts import convert_funcs, get_funcs
 from other.my_secrets import MySecrets
-from arcgis.apps.storymap import JournalStoryMap
 
 # GIS_OBJ = MySecrets.get_agol_gis(user=)
 AGOL_DICT = MySecrets.AGOL_DICT
@@ -14,7 +13,9 @@ NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
 URL_PARAM = AGOL_DICT["DEV_URL_PARAM"]
 
 
-def add_file_to_agol(gis_obj, file_path, agol_folder=None, title=None) -> gis.Item:
+def add_file_to_agol(
+    gis_obj, file_path, agol_folder=None, title=None
+) -> gis.Item:  # Add flags such as sharing='org'
 
     item_types = {"csv": "csv", "zip": "File Geodatabase", "json": "Dashboard"}
 
