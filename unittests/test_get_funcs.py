@@ -8,9 +8,11 @@ AGOL_DICT = MySecrets.AGOL_DICT
 
 
 class TestClass(unittest.TestCase):
+    GIS = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
+
     def test_get_items_from_group(self):
         items = get_funcs.get_items_from_group(
-            gis_obj=GIS_OBJ, group_id="74675128c9e84b5ca3874b40df5662c6",
+            gis_obj=self.GIS, group_id="74675128c9e84b5ca3874b40df5662c6",
         )
         self.assertIsInstance(items, list)
 
