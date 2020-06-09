@@ -4,21 +4,22 @@ from arcgis import features
 from other.my_secrets import MySecrets
 from arcgis.apps.storymap import JournalStoryMap
 
-GIS_OBJ = ""  # todo: this needs to be fixed
 AGOL_DICT = MySecrets.AGOL_DICT
 AGOL_ITEM_DICT = MySecrets.AGOL_ITEM_DICT
 FEATURE_LAYER = AGOL_ITEM_DICT["DEVEXT_FEATURE_LAYER_ITEM"]
 
 
 class TestClass(unittest.TestCase):
+    gis_obj = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
+
     def test_add_dashboard_sections_to_storymap(self):
         dashboard_items = get_funcs.get_items_from_folder(
-            GIS_OBJ, "7_Dashboards", item_types=["Dashboard"]
+            self.gis_obj, "7_Dashboards", item_types=["Dashboard"]
         )
         build_name = "release-10.8.1"
         build_type = "3x_NICKEL_BUILDER"
         url_params = AGOL_DICT["DEV_URL_PARAM"]
-        storymap = JournalStoryMap(gis=GIS_OBJ)
+        storymap = JournalStoryMap(gis=self.gis_obj)
         storymap_obj = edit_funcs.add_dashboard_sections_to_storymap(
             storymap_obj=storymap,
             dashboard_items=dashboard_items,

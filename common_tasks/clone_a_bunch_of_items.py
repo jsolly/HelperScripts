@@ -1,5 +1,5 @@
 from other.my_secrets import MySecrets
-from GitHub.HelperScripts import create_funcs, clone_funcs
+from GitHub.HelperScripts import clone_funcs
 
 GIS = MySecrets.get_agol_gis(environment="PROD_ENV", user="DBQA_REGRESSION")
 # GIS = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_REGRESSION")

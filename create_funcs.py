@@ -13,6 +13,16 @@ NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
 URL_PARAM = AGOL_DICT["DEV_URL_PARAM"]
 
 
+def create_group_in_agol(gis_obj, group_name):
+    try:
+        gis_obj.groups.create(title=group_name, tags="DashboardQA")
+    except Exception as e:
+        if "You already have a group" in e.args[0]:
+            print("This group already exists")
+        else:
+            raise Exception("This is an exception I have never seen before!", e)
+
+
 def add_file_to_agol(
     gis_obj, file_path, agol_folder=None, title=None
 ) -> gis.Item:  # Add flags such as sharing='org'
@@ -23,7 +33,7 @@ def add_file_to_agol(
     title = file_path_parts.stem if not title else title
     file_type = item_types[file_path_parts.suffix[1:]]
 
-    item_prop = {"title": title, "file_type": file_type}
+    item_prop = {"title": title, "type": file_type}
 
     item = gis_obj.content.add(
         item_properties=item_prop, data=file_path, folder=agol_folder
@@ -31,10 +41,10 @@ def add_file_to_agol(
     return item
 
 
-def publish_items_in_folder(gis_obj, agol_folder):
+def publish_items_in_folder(gis_obj, agol_folder) -> bool:
     items = get_funcs.get_items_from_folders(gis_obj=gis_obj, folders=[agol_folder])
     for item in items:
-        item.publish()
+        return item.publish()
 
 
 def rest_publish_item(parameters: dict):
@@ -139,7 +149,3 @@ def create_webmap_from_public_layer(agol_folder=None):
 
 def create_dashboard(gis_obj, dashboard_json_path, file_type="Dashboard"):
     add_file_to_agol(gis_obj, dashboard_json_path, file_type)
-
-
-def create_group_in_agol(gis_obj, group_name):
-    gis_obj.groups.create(title=group_name, tags="DashboardQA")

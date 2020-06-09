@@ -8,11 +8,51 @@ AGOL_DICT = MySecrets.AGOL_DICT
 
 
 class TestClass(unittest.TestCase):
-    GIS = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
+    gis_obj = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
+
+    def test_get_group_id_from_group_name(self):
+        group_id = get_funcs.get_group_id_from_group_name(
+            self.gis_obj, "Dashboard_QA_group"
+        )
+        self.assertEqual(group_id, "9d181d2925ce48b6aac0a916497da56a")
+
+    def test_get_links_from_string(self):
+        string = "strings https://arcgis.com and more strings"
+        link = get_funcs.get_links_from_string(string)
+        self.assertEqual(
+            link, "https://arcgis.com"
+        )  # Is this testing a constant? Bad prtactice?
+
+    def test_get_item_ids_from_string(self):
+        string = """
+                Sample webmap with all geom and refresh types:
+                id: a540748151b84753b609d67488be363e
+                org: dbqa in devext
+                Sample dashboard
+                id: d54f71aadaca4cd1899e133bdf3c028c
+                org: dbqa in devext
+                """
+        item_ids = get_funcs.get_item_ids_from_string(string)
+        actual_item_ids = [
+            "a540748151b84753b609d67488be363e",
+            "d54f71aadaca4cd1899e133bdf3c028c",
+        ]
+
+        self.assertEqual(item_ids, actual_item_ids)
+
+    def test_get_item_from_item_id(self):
+        item_id = "a540748151b84753b609d67488be363e"
+        item = get_funcs.get_item_from_item_id(item_id)
+        self.assertIsInstance(item, Item)
+
+    def test_get_item_host_name(self):
+        item = self.gis_obj.content.get("ec18963f29864b7baf5f5eb236f6a545")
+        item_host_name = get_funcs.get_item_host_name(item)
+        self.assertEqual(item_host_name, AGOL_DICT["AGOL_DBQA_DEVEXT_HOST_NAME"])
 
     def test_get_items_from_group(self):
         items = get_funcs.get_items_from_group(
-            gis_obj=self.GIS, group_id="74675128c9e84b5ca3874b40df5662c6",
+            gis_obj=self.gis_obj, group_id="74675128c9e84b5ca3874b40df5662c6",
         )
         self.assertIsInstance(items, list)
 
@@ -40,7 +80,7 @@ class TestClass(unittest.TestCase):
         self.assertEqual(item_id, "461ac62237774768bb40bca2b2b4c867")
 
     def test_get_story_map_entries(self):
-        story_map_item = GIS_OBJ.content.get("614a35d1a4ac4ab894efed130dee3f2a")
+        story_map_item = self.gis_obj.content.get("614a35d1a4ac4ab894efed130dee3f2a")
         entries = get_funcs.get_storymap_entries(story_map_item)
         self.assertTrue(len(entries) == 11)
 
@@ -57,7 +97,7 @@ class TestClass(unittest.TestCase):
         self.assertEqual(dashboard_version, 27)
 
     def test_get_items_from_folder(self):
-        items = get_funcs.get_items_from_folder(GIS_OBJ, "Sample_Dashboards")
+        items = get_funcs.get_items_from_folder(self.gis_obj, "Sample_Dashboards")
         self.assertEqual(len(items), 2)
 
     def test_get_items_from_folders(self):
@@ -85,13 +125,13 @@ class TestClass(unittest.TestCase):
 
     def test_get_constructed_layers_from_webmap_obj(self):
         constructed_webmap_layers = get_funcs.get_constructed_layers_from_from_webmap_obj(
-            AGOL_ITEM_DICT["DEVEXT_WEBMAP_OBJ"], GIS_OBJ
+            AGOL_ITEM_DICT["DEVEXT_WEBMAP_OBJ"], self.gis_obj
         )
         self.assertIsInstance(constructed_webmap_layers, list)
         self.assertEqual(len(constructed_webmap_layers), 3)  # Not sure if 3 is right.
 
     def test_get_dashboard_item_data_sources(self):
         dashboard_item_data_sources = get_funcs.get_dashboard_item_data_sources(
-            AGOL_ITEM_DICT["VERSION_27_DASHBOARD_JSON"], GIS_OBJ
+            AGOL_ITEM_DICT["VERSION_27_DASHBOARD_JSON"], self.gis_obj
         )
         self.assertIsInstance(dashboard_item_data_sources[0], gis.Item)

@@ -9,10 +9,63 @@ import time
 import subprocess
 
 
+def get_group_id_from_group_name(gis_obj, group_name):
+    top_result = gis_obj.groups.search(query=group_name)[0]
+    return top_result.id
+
+
+def get_dashboard_ids_with_webmap(gis_user, webmap_id, orgid):  # This needs work
+    dashboards = gis_user.content.advanced_search(
+        f'type: "Dashboard" AND orgid:{orgid}', max_items=2000
+    )["results"]
+    dashboard_ids_dict = {}
+    for dashboard_item in dashboards:
+        try:
+            dashboard_dict = dashboard_item.get_data()
+            if "widgets" in dashboard_dict:
+                for widget in dashboard_dict["widgets"]:
+                    if widget["type"] == "mapWidget":
+                        if widget["itemId"] == webmap_id:
+                            dashboard_ids_dict[dashboard_item.owner] = dashboard_item.id
+                            break  # No need to find it multiple times
+        except:
+            pass
+
+    return dashboard_ids_dict
+
+
+def get_links_from_string(string) -> list:
+    url_pattern = re.compile(
+        "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+    )
+    urls = url_pattern.findall(string)
+    return urls
+
+
+def get_item_ids_from_string(string):
+    item_id_pattern = re.compile("[0-9a-f]{32}")
+    item_ids = item_id_pattern.findall(string)
+    return item_ids
+
+
+def get_item_from_item_id(item_id, gis_objs: list):  # todo: implement a closure
+
+    for gis in gis_objs:
+        item = gis.content.get(item_id)
+        if item:
+            return item
+
+    return False
+
+
+def get_item_host_name(item_obj):
+    item_url = item_obj.homepage
+    host_name = urlparse(item_url).hostname
+    return host_name
+
+
 def get_items_from_group(gis_obj, group_id, item_types=None):
-    group_items = gis_obj.groups.get(
-        "dfe07fe13d154b67bbd7a38a2be90fd9"
-    ).content()  # max_items=1000
+    group_items = gis_obj.groups.get(group_id).content()  # max_items=1000
 
     if item_types:
         filtered_items = [item for item in group_items if item.type in item_types]
@@ -72,6 +125,14 @@ def get_items_from_folder(
         folder_items = [item for item in folder_items if item.type in item_types]
 
     return folder_items
+
+
+def get_item_ids_from_folder(
+    gis_obj, folder, item_types=None
+) -> list:  # folder=None returns the root folder
+
+    folder_items = get_items_from_folder(gis_obj, folder, item_types=item_types)
+    return [item.id for item in folder_items]
 
 
 def get_items_from_folders(
