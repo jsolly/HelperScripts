@@ -12,6 +12,16 @@ FEATURE_LAYER = AGOL_ITEM_DICT["DEVEXT_FEATURE_LAYER_ITEM"]
 class TestClass(unittest.TestCase):
     gis_obj = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
 
+    def test_delete_items_from_folder(self):
+        folder = "Temp"
+        self.assertGreater(
+            len(get_funcs.get_items_from_folder(self.gis_obj, folder)), 0
+        )
+
+        edit_funcs.delete_items_from_folder(self.gis_obj, "Temp")
+
+        self.assertEqual(len(get_funcs.get_items_from_folder(self.gis_obj, folder)), 0)
+
     def test_add_dashboard_sections_to_storymap(self):
         dashboard_items = get_funcs.get_items_from_folder(
             self.gis_obj, "7_Dashboards", item_types=["Dashboard"]
