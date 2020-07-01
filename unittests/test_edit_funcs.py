@@ -2,7 +2,6 @@ import unittest
 from GitHub.HelperScripts import edit_funcs, get_funcs
 from arcgis import features
 from other.my_secrets import MySecrets
-from arcgis.apps.storymap import JournalStoryMap
 
 AGOL_DICT = MySecrets.AGOL_DICT
 AGOL_ITEM_DICT = MySecrets.AGOL_ITEM_DICT
@@ -11,6 +10,16 @@ FEATURE_LAYER = AGOL_ITEM_DICT["DEVEXT_FEATURE_LAYER_ITEM"]
 
 class TestClass(unittest.TestCase):
     gis_obj = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
+
+    def test_swizzle_dashboard_webmaps(self):
+        dashboard_item = self.gis_obj.content.get()
+        webmap_dict = {
+            "fbe59de7e1404fa694b91e231262af53": "4b22390109554cffa720c838864e4339",
+            "fb2676810dd947eeb9d04a377376fad1": "99ab708973464b6fa4be8f673d457e7d",
+        }  # {original, new}
+
+    def update_dashboard_with_new_json(self):
+        print("TODO")
 
     def test_delete_items_from_folder(self):
         folder = "Temp"
@@ -21,25 +30,6 @@ class TestClass(unittest.TestCase):
         edit_funcs.delete_items_from_folder(self.gis_obj, "Temp")
 
         self.assertEqual(len(get_funcs.get_items_from_folder(self.gis_obj, folder)), 0)
-
-    def test_add_dashboard_sections_to_storymap(self):
-        dashboard_items = get_funcs.get_items_from_folder(
-            self.gis_obj, "7_Dashboards", item_types=["Dashboard"]
-        )
-        build_name = "release-10.8.1"
-        build_type = "3x_NICKEL_BUILDER"
-        url_params = AGOL_DICT["DEV_URL_PARAM"]
-        storymap = JournalStoryMap(gis=self.gis_obj)
-        storymap_obj = edit_funcs.add_dashboard_sections_to_storymap(
-            storymap_obj=storymap,
-            dashboard_items=dashboard_items,
-            build_name=build_name,
-            build_type=build_type,
-            url_params=url_params,
-        )
-        storymap_sections = storymap_obj.properties["values"]["story"]["sections"]
-        self.assertEqual(len(storymap_sections), 8)
-        storymap_obj.save(title=f"Dashboard Embed Scenarios with {build_name} urls")
 
     def test_update_item_data(self):
         file_path = "../input/covid_modified.csv"

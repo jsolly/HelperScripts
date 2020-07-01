@@ -48,12 +48,18 @@ def get_item_ids_from_string(string):
     return item_ids
 
 
-def get_item_from_item_id(item_id, gis_objs: list):  # todo: implement a closure
+def get_item_from_item_id(item_id, gis_objs: list):
 
     for gis in gis_objs:
-        item = gis.content.get(item_id)
-        if item:
-            return item
+        try:
+            item = gis.content.get(item_id)
+            if item:
+                return item
+        except Exception as e:
+            if "Item does not exist" in e.args[0]:
+                continue
+            else:
+                raise Exception("I have never seen this error before")
 
     return False
 

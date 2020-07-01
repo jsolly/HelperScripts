@@ -14,34 +14,17 @@ PORTAL_DICT = MySecrets.PORTAL_DICT
 NICKEL_BUILDER = AGOL_DICT["NICKEL_BUILDER_HOST_NAME"]
 
 
-def add_dashboard_sections_to_storymap(
-    storymap_obj, dashboard_items: list, build_name, build_type, url_params=None
-):
-    dashboard_url_dict = {
-        "3X_NICKEL_BUILDER": f"{NICKEL_BUILDER}/{build_name}/#",
-        "4X_NICKEL_BUILDER": f"{NICKEL_BUILDER}/{build_name}/dashboards",
-        "4X_DEV": f"{AGOL_DICT['DEV_ENV']}/apps/dashboards",
-        "3X_DEV": f"{AGOL_DICT['DEV_ENV']}/apps/opsdashboard/index.html#",
-        "MY_PORTAL": PORTAL_DICT["MY_PORTAL"],
-    }
-    storymap_obj.add(
-        title=f"Dashboard Embed Scenarios",
-        content="Example Website",
-        url_or_item="https://www.example.com",
-    )
-    url_params = "" if not url_params else AGOL_DICT[url_params]
+# def swizzle_dashboard_webmaps(dashboard_id, webmap_dict):
+#
+#     item_properties = {"type": "CSV"}
+#     return item.update(item_properties=item_properties, data=file_path)
 
-    for dashboard_item in dashboard_items:
-        parameter_seperator = "?" if "3X" in build_type else "#"
-        dashboard_url = f"https://{dashboard_url_dict[build_type]}/{dashboard_item.id}{parameter_seperator}{url_params}"
 
-        storymap_obj.add(
-            title=f"{dashboard_item.title} {build_name}",
-            content=f"{dashboard_item.title} {build_name}",
-            url_or_item=dashboard_url,
-        )
-
-    return storymap_obj
+def update_dashboard_with_new_json(dashboard_item, raw_json):
+    dashboard_properties = {
+        "text": json.dumps(raw_json)
+    }  # the `text` value of an item contains all of the data for the dashboard...need to convert it to a string
+    dashboard_item.update(dashboard_properties)
 
 
 def update_item_data(item, file_path) -> bool:
