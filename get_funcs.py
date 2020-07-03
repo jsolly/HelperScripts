@@ -20,16 +20,13 @@ def get_dashboard_ids_with_webmap(gis_user, webmap_id, orgid):  # This needs wor
     )["results"]
     dashboard_ids_dict = {}
     for dashboard_item in dashboards:
-        try:
-            dashboard_dict = dashboard_item.get_data()
-            if "widgets" in dashboard_dict:
-                for widget in dashboard_dict["widgets"]:
-                    if widget["type"] == "mapWidget":
-                        if widget["itemId"] == webmap_id:
-                            dashboard_ids_dict[dashboard_item.owner] = dashboard_item.id
-                            break  # No need to find it multiple times
-        except:
-            pass
+        dashboard_dict = dashboard_item.get_data()
+        if "widgets" in dashboard_dict:
+            for widget in dashboard_dict["widgets"]:
+                if widget["type"] == "mapWidget":
+                    if widget["itemId"] == webmap_id:
+                        dashboard_ids_dict[dashboard_item.owner] = dashboard_item.id
+                        break  # No need to find it multiple times
 
     return dashboard_ids_dict
 
@@ -50,14 +47,18 @@ def get_item_ids_from_string(string):
 
 def get_item_from_item_id(item_id, gis_objs: list):
 
-    for gis in gis_objs:
+    for gis_obj in gis_objs:
         try:
-            item = gis.content.get(item_id)
+            item = gis_obj.content.get(item_id)
             if item:
                 return item
         except Exception as e:
             if "Item does not exist" in e.args[0]:
                 continue
+
+            if "do not have permissions" in e.args[0]:
+                continue
+
             else:
                 raise Exception("I have never seen this error before")
 
@@ -82,7 +83,7 @@ def get_items_from_group(gis_obj, group_id, item_types=None):
 
 def get_func_run_time(func, *args):
     t1 = time.perf_counter_ns()
-    func(args)
+    func(*args)
     t2 = time.perf_counter_ns()
     return t2 - t1
 
@@ -106,7 +107,7 @@ def get_item_id_from_dashboard_url(dashboard_url) -> str:
 
 def get_storymap_entries(storymap_item):
     storymap_data = storymap_item.get_data()
-    return storymap_data["values"]["story"]["entries"]
+    return storymap_data["values"]["story"]["sections"]
 
 
 def get_url_host_name(url) -> str:

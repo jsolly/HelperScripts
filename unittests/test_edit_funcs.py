@@ -11,15 +11,15 @@ FEATURE_LAYER = AGOL_ITEM_DICT["DEVEXT_FEATURE_LAYER_ITEM"]
 class TestClass(unittest.TestCase):
     gis_obj = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
 
-    def test_swizzle_dashboard_webmaps(self):
-        dashboard_item = self.gis_obj.content.get()
-        webmap_dict = {
-            "fbe59de7e1404fa694b91e231262af53": "4b22390109554cffa720c838864e4339",
-            "fb2676810dd947eeb9d04a377376fad1": "99ab708973464b6fa4be8f673d457e7d",
-        }  # {original, new}
+    # def test_swizzle_dashboard_webmaps(self):
+    #     dashboard_item = self.gis_obj.content.get()
+    #     webmap_dict = {
+    #         "fbe59de7e1404fa694b91e231262af53": "4b22390109554cffa720c838864e4339",
+    #         "fb2676810dd947eeb9d04a377376fad1": "99ab708973464b6fa4be8f673d457e7d",
+    #     }  # {original, new}
 
-    def update_dashboard_with_new_json(self):
-        print("TODO")
+    # def update_dashboard_with_new_json(self):
+    #     print("TODO")
 
     def test_delete_items_from_folder(self):
         folder = "Temp"
@@ -33,7 +33,7 @@ class TestClass(unittest.TestCase):
 
     def test_update_item_data(self):
         file_path = "../input/covid_modified.csv"
-        item = GIS_OBJ.content.get("33ff12dc309d4af489d376baee4b810e")
+        item = self.gis_obj.content.get("33ff12dc309d4af489d376baee4b810e")
         update = edit_funcs.update_item_data(item, file_path)
         self.assertTrue(update)
 

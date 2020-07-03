@@ -3,7 +3,7 @@ from arcgis import gis, mapping, features
 from GitHub.HelperScripts import get_funcs
 from other.my_secrets import MySecrets
 
-AGOL_ITEM_DICT = MySecrets.AGOL_DICT
+AGOL_ITEM_DICT = MySecrets.AGOL_ITEM_DICT
 AGOL_DICT = MySecrets.AGOL_DICT
 
 
@@ -18,7 +18,7 @@ class TestClass(unittest.TestCase):
 
     def test_get_links_from_string(self):
         string = "strings https://arcgis.com and more strings"
-        link = get_funcs.get_links_from_string(string)
+        link = get_funcs.get_links_from_string(string)[0]
         self.assertEqual(
             link, "https://arcgis.com"
         )  # Is this testing a constant? Bad prtactice?
@@ -41,18 +41,19 @@ class TestClass(unittest.TestCase):
         self.assertEqual(item_ids, actual_item_ids)
 
     def test_get_item_from_item_id(self):
+        gis_objs = MySecrets.get_all_admin_gis_objs()
         item_id = "a540748151b84753b609d67488be363e"
-        item = get_funcs.get_item_from_item_id(item_id)
-        self.assertIsInstance(item, Item)
+        item = get_funcs.get_item_from_item_id(item_id, gis_objs)
+        self.assertIsInstance(item, gis.Item)
 
     def test_get_item_host_name(self):
         item = self.gis_obj.content.get("ec18963f29864b7baf5f5eb236f6a545")
         item_host_name = get_funcs.get_item_host_name(item)
-        self.assertEqual(item_host_name, AGOL_DICT["AGOL_DBQA_DEVEXT_HOST_NAME"])
+        self.assertEqual(item_host_name, AGOL_DICT["DEV_ORG_ENV"])
 
     def test_get_items_from_group(self):
         items = get_funcs.get_items_from_group(
-            gis_obj=self.gis_obj, group_id="74675128c9e84b5ca3874b40df5662c6",
+            self.gis_obj, "74675128c9e84b5ca3874b40df5662c6",
         )
         self.assertIsInstance(items, list)
 
@@ -80,41 +81,55 @@ class TestClass(unittest.TestCase):
         self.assertEqual(item_id, "461ac62237774768bb40bca2b2b4c867")
 
     def test_get_story_map_entries(self):
-        story_map_item = self.gis_obj.content.get("614a35d1a4ac4ab894efed130dee3f2a")
+        story_map_item = self.gis_obj.content.get("480b1780fb0f4ec89b9e184ce35288a2")
         entries = get_funcs.get_storymap_entries(story_map_item)
-        self.assertTrue(len(entries) == 11)
+        self.assertEqual(len(entries), 8)
 
     def test_get_url_host_name(self):
-        url = f"{https://AGOL_DICT['DEV_ENV']}/home/content.html?view=list&sortOrder=desc&sortField=modified"
+        url = f"https://{AGOL_DICT['DEV_ENV']}/home/content.html?view=list&sortOrder=desc&sortField=modified"
         host_name = get_funcs.get_url_host_name(url)
-        self.assertEqual(host_name, AGOL_DICT["DEV_ENV"])
+        self.assertEqual(host_name, f"https://{AGOL_DICT['DEV_ENV']}")
 
     def test_get_dashboard_version(self):
-
-        dashboard_version = get_funcs.get_dashboard_version(
-            AGOL_ITEM_DICT["VERSION_27_DASHBOARD_JSON"]
+        dashboard_item = self.gis_obj.content.get(
+            AGOL_ITEM_DICT["DEVEXT_VERSION_27_DASHBOARD_ITEM_ID"]
         )
+        dashboard_json = dashboard_item.get_data()
+
+        dashboard_version = get_funcs.get_dashboard_version(dashboard_json)
         self.assertEqual(dashboard_version, 27)
 
     def test_get_items_from_folder(self):
-        items = get_funcs.get_items_from_folder(self.gis_obj, "Sample_Dashboards")
-        self.assertEqual(len(items), 2)
+        items = get_funcs.get_items_from_folder(self.gis_obj, "3 Items")
+        self.assertEqual(len(items), 3)
 
     def test_get_items_from_folders(self):
-        items = get_funcs.get_items_from_folders(
-            self.GIS_OBJ, ["Sample_Dashboards", "Five Items"]
-        )
-        self.assertEqual(len(items), 7)
+        items = get_funcs.get_items_from_folders(self.gis_obj, ["3 Items", "5 Items"])
+        self.assertEqual(len(items), 8)
 
     def test_get_constructed_objects_from_items(self):
+        webmap_item = self.gis_obj.content.get(
+            AGOL_ITEM_DICT["SANITY_TEST_WEBMAP_ITEM_ID"]
+        )
+
+        feature_layer_collection_item = self.gis_obj.content.get(
+            AGOL_ITEM_DICT["DEVEXT_FEATURE_LAYER_COLLECTION_ITEM"]
+        )
+
+        dashboard_item = self.gis_obj.content.get(
+            AGOL_ITEM_DICT["DEVEXT_VERSION_27_DASHBOARD_ITEM_ID"]
+        )
+
         webmap_obj = get_funcs.get_constructed_objects_from_items(
-            [AGOL_ITEM_DICT["DEVEXT_WEBMAP_OBJ"]], GIS_OBJ
+            [webmap_item], self.gis_obj
         )[0]
+
         feature_layer_collection_obj = get_funcs.get_constructed_objects_from_items(
-            [AGOL_ITEM_DICT["DEVEXT_FEATURE_LAYER_COLLECTION_ITEM"]], GIS_OBJ,
+            [feature_layer_collection_item], self.gis_obj,
         )[0]
+
         dashboard_obj = get_funcs.get_constructed_objects_from_items(
-            [AGOL_ITEM_DICT["DEVEXT_VERSION_27_DASHBOARD_ITEM"]], GIS_OBJ,
+            [dashboard_item], self.gis_obj,
         )[0]
 
         self.assertIsInstance(webmap_obj, mapping.WebMap)
@@ -124,14 +139,22 @@ class TestClass(unittest.TestCase):
         self.assertIsInstance(dashboard_obj, dict)
 
     def test_get_constructed_layers_from_webmap_obj(self):
+        webmap_item = gis.Item(
+            gis=self.gis_obj, itemid=AGOL_ITEM_DICT["SANITY_TEST_WEBMAP_ITEM_ID"]
+        )
+        webmap_obj = mapping.WebMap(webmapitem=webmap_item)
         constructed_webmap_layers = get_funcs.get_constructed_layers_from_from_webmap_obj(
-            AGOL_ITEM_DICT["DEVEXT_WEBMAP_OBJ"], self.gis_obj
+            webmap_obj, self.gis_obj
         )
         self.assertIsInstance(constructed_webmap_layers, list)
-        self.assertEqual(len(constructed_webmap_layers), 3)  # Not sure if 3 is right.
+        self.assertEqual(len(constructed_webmap_layers), 15)
 
     def test_get_dashboard_item_data_sources(self):
+        dashboard_item = self.gis_obj.content.get(
+            AGOL_ITEM_DICT["DEVEXT_VERSION_27_DASHBOARD_ITEM_ID"]
+        )
+        dashboard_json = dashboard_item.get_data()
         dashboard_item_data_sources = get_funcs.get_dashboard_item_data_sources(
-            AGOL_ITEM_DICT["VERSION_27_DASHBOARD_JSON"], self.gis_obj
+            dashboard_json, self.gis_obj
         )
         self.assertIsInstance(dashboard_item_data_sources[0], gis.Item)
