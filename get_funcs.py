@@ -36,6 +36,14 @@ def get_links_from_string(string) -> list:
         "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
     )
     urls = url_pattern.findall(string)
+    for index, url in enumerate(urls):
+        matches = [")", ",", "'"]
+        if any(
+            x in url for x in matches
+        ):  # This logic could bite me later. Pretty fragile.
+            urls[index] = url.replace(")", "").replace(",", "").replace("'", "")
+            if urls[index][-1] == ".":
+                urls[index] = urls[index][:-1]
     return urls
 
 

@@ -29,6 +29,12 @@ def check_is_url_reachable(url):
         if response.ok:
             return True, response.status_code
 
+        elif response.status_code == 401:  # Unauthorized
+            return True, response.status_code
+
+        elif response.status_code == 403:  # Forbidden
+            return True, response.status_code
+
         else:
             return (
                 False,
@@ -38,24 +44,27 @@ def check_is_url_reachable(url):
     except requests.exceptions.SSLError:
         return True, "There was an SSLError"
 
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as e:
         return False, f"Server could not be found when attempting to access {url}"
 
     except requests.exceptions.ReadTimeout:
         return False, f"I timed out when attempting to access {url}"
 
 
-def check_string_for_items_in_orgs(string, gis_objs: list, org_name) -> list:
+def check_string_for_items_in_orgs(string, gis_objs: list, org_ids) -> list:
     item_ids = get_funcs.get_item_ids_from_string(string)
     items = []
-    try:
-        for item_id in item_ids:
-            item = get_funcs.get_item_from_item_id(item_id, gis_objs)
-            if item:
-                if check_string_contains_substring(item.homepage, org_name):
+    for item_id in item_ids:
+        item = get_funcs.get_item_from_item_id(item_id, gis_objs)
+        if item:
+            try:
+                if item.orgId in org_ids:
                     items.append(item.id)
-    except Exception as e:
-        print(e)
+            except AttributeError:
+                if item.owner in ["regression"] or check_string_contains_substring(
+                    item.owner, "nitro"
+                ):
+                    items.append(item.id)
 
     return items
 
