@@ -60,6 +60,10 @@ def get_item_from_item_id(item_id, gis_objs: list):
             item = gis_obj.content.get(item_id)
             if item:
                 return item
+        except ConnectionError:
+            # Sometimes happens. Not sure why
+            continue
+
         except Exception as e:
             if "Item does not exist" in e.args[0]:
                 continue

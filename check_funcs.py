@@ -1,6 +1,15 @@
 from GitHub.HelperScripts import get_funcs
 import re
 import requests
+import signal
+
+
+class TimeoutException(Exception):
+    pass
+
+
+def _timeout(signum, frame):
+    raise TimeoutException()
 
 
 def check_string_for_bad_links(string):
@@ -24,6 +33,8 @@ def check_string_contains_substring(string, substring) -> bool:
 
 
 def check_is_url_reachable(url):
+    signal.signal(signal.SIGALRM, _timeout)
+    signal.alarm(5)  # Kill a request if it takes too long
     try:
         response = requests.get(url, timeout=3)
         if response.ok:
@@ -33,6 +44,9 @@ def check_is_url_reachable(url):
             return True, response.status_code
 
         elif response.status_code == 403:  # Forbidden
+            return True, response.status_code
+
+        elif response.status_code == 406:  # Invalid request headers
             return True, response.status_code
 
         else:
@@ -49,6 +63,12 @@ def check_is_url_reachable(url):
 
     except requests.exceptions.ReadTimeout:
         return False, f"I timed out when attempting to access {url}"
+
+    except TimeoutException:
+        return True, "I stopped fetching data after 5 seconds"
+
+    finally:
+        signal.alarm(0)  # Abort alarm
 
 
 def check_string_for_items_in_orgs(string, gis_objs: list, org_ids) -> list:
