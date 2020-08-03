@@ -18,9 +18,6 @@ class TestClass(unittest.TestCase):
     #         "fb2676810dd947eeb9d04a377376fad1": "99ab708973464b6fa4be8f673d457e7d",
     #     }  # {original, new}
 
-    # def update_dashboard_with_new_json(self):
-    #     print("TODO")
-
     def test_delete_items_from_folder(self):
         folder = "Temp"
         self.assertGreater(
