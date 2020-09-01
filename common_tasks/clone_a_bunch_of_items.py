@@ -1,17 +1,18 @@
 from other.my_secrets import MySecrets
 from GitHub.HelperScripts import clone_funcs
 
-# GIS = MySecrets.get_agol_gis(environment="PROD_ENV", user="DBQA_ADMIN")
+GIS = MySecrets.get_agol_gis(environment="PROD_ENV", user="DBQA_ADMIN")
 GIS_2 = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_REGRESSION")
 # GIS_3 = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_ADMIN")
-GIS_4 = MySecrets.get_agol_gis(environment="DEV_ENV", user="NITRO_ADMIN")
+# GIS_4 = MySecrets.get_agol_gis(environment="DEV_ENV", user="NITRO_ADMIN")
+# GIS_5 = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_JOHN")
 # GIS = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
 # BUILT_IN_GIS = MySecrets.get_portal_gis(environment="BUILT-IN_ENV", user="CREATOR")
-TARGET_FOLDER = "_Generic_Maps"
+TARGET_FOLDER = "_Cloned"
 
 
 # Clone an item
-item = GIS_4.content.get("8cccbe74517e428e824e54dd2851c98c")
+item = GIS.content.get("19a8e55597694da48ab07a12e2c834e5")
 GIS_2.content.clone_items(items=[item], folder=TARGET_FOLDER)
 
 # 'fb2676810dd947eeb9d04a377376fad1'

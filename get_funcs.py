@@ -7,6 +7,13 @@ from arcgis import gis, mapping
 from urllib.parse import urlparse
 import time
 import subprocess
+from json.decoder import JSONDecodeError
+
+
+def get_all_items_in_org(gis_obj, item_type="Dashboard"):
+    return gis_obj.content.advanced_search(
+        f"type: {item_type} AND orgid:{gis_obj.properties.id}", max_items=5000
+    )["results"]
 
 
 def get_group_id_from_group_name(gis_obj, group_name):
@@ -164,20 +171,20 @@ def get_items_from_folders(
     return all_items
 
 
-def get_constructed_objects_from_items(items: list, gis_obj) -> list:
+def get_constructed_objects_from_items(items: list) -> list:
     constructed_objects = []
 
     for item in items:
         if item.type == "Feature Service":
             if bool(item.url[-1].isdigit()):
-                feature_layer_obj = features.FeatureLayer(url=item.url, gis=gis_obj)
+                feature_layer_obj = features.FeatureLayer(url=item.url, gis=item._gis)
                 feature_layer_obj = (
                     feature_layer_obj.properties
                 )  # sometimes this triggers an error
                 constructed_objects.append(feature_layer_obj)
 
             feature_layer_collection = features.FeatureLayerCollection(
-                url=item.url, gis=gis_obj
+                url=item.url, gis=item._gis
             )
             constructed_objects.append(feature_layer_collection)
 
@@ -185,7 +192,10 @@ def get_constructed_objects_from_items(items: list, gis_obj) -> list:
             constructed_objects.append(mapping.WebMap(webmapitem=item))
 
         elif item.type == "Dashboard":
-            constructed_objects.append(item.get_data())
+            try:
+                constructed_objects.append(item.get_data())
+            except JSONDecodeError:
+                pass
 
     return constructed_objects
 
@@ -197,17 +207,23 @@ def get_constructed_layers_from_from_webmap_obj(webmap_obj, gis_obj) -> list:
 
     if webmap_layers:
         for layer in webmap_layers:
-            if "url" in layer:  # Clientside layers don't have a url
-                if bool(layer.url[-1].isdigit()):
-                    layer = features.FeatureLayer(url=layer.url, gis=gis_obj)
-                    # sometimes accessing properties triggers an attribute error.
-                    assert layer.properties
-                else:
-                    layer = features.FeatureLayerCollection(url=layer.url, gis=gis_obj)
-                    assert layer.properties
+            try:
+                if "url" in layer:  # Clientside layers don't have a url
+                    if bool(layer.url[-1].isdigit()):
+                        layer = features.FeatureLayer(url=layer.url, gis=gis_obj)
+                        # sometimes accessing properties triggers an attribute error.
+                        assert layer.properties
+                    else:
+                        layer = features.FeatureLayerCollection(
+                            url=layer.url, gis=gis_obj
+                        )
+                        assert layer.properties
 
-            if layer:
-                constructed_layers.append(layer)
+                if layer:
+                    constructed_layers.append(layer)
+            except Exception as e:
+                if "not found" in e.args[0]:
+                    continue
 
     if webmap_tables:
         for table in webmap_tables:
@@ -219,7 +235,9 @@ def get_constructed_layers_from_from_webmap_obj(webmap_obj, gis_obj) -> list:
     return constructed_layers
 
 
-def get_dashboard_item_data_sources(dashboard_json, gis_obj) -> list:
+def get_dashboard_item_data_sources_from_dashboard_json(
+    dashboard_json, gis_obj
+) -> list:
     data_source_item_ids = []
     if "widgets" in dashboard_json:
         for widget in dashboard_json["widgets"]:
@@ -256,7 +274,12 @@ def get_dashboard_item_data_sources(dashboard_json, gis_obj) -> list:
 
     item_objs = []
     for item_id in data_source_item_ids:
-        item = gis_obj.content.get(item_id)
+        try:
+            item = gis_obj.content.get(item_id)
+        except Exception as e:
+            if "Item does not exist" in e.args[0]:
+                continue
+            raise Exception(f"I have never seen this error: {e} before!")
         item_objs.append(item)
 
     return item_objs
