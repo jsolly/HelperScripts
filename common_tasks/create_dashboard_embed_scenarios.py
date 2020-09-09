@@ -47,7 +47,7 @@ if __name__ == "__main__":
         gis_obj, "Sharing_Options", item_types=["Dashboard"]
     )
     build_name = "Production 8.2"
-    build_type = "4X_PROD_ORG"
+    build_type = "4X_PROD_GENERIC"
     title = f"Dashboard Embed Scenarios with {build_name} urls {build_type}"
     # url_params = AGOL_DICT["DEV_URL_PARAM"]
     storymap = JournalStoryMap(gis_obj)
