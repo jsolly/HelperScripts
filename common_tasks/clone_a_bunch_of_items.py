@@ -1,20 +1,20 @@
 from other.my_secrets import MySecrets
 from GitHub.HelperScripts import clone_funcs
 
-# GIS = MySecrets.get_agol_gis(environment="PROD_ENV", user="DBQA_ADMIN")
+GIS = MySecrets.get_agol_gis(environment="PROD_ENV", user="DBQA_ADMIN")
 GIS_2 = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_REGRESSION")
 # GIS_3 = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_ADMIN")
 # GIS_4 = MySecrets.get_agol_gis(environment="DEV_ENV", user="NITRO_ADMIN")
 # GIS_5 = MySecrets.get_agol_gis(environment="DEV_ENV", user="DBQA_JOHN")
 # GIS = MySecrets.get_agol_gis("DEV_ENV", "DBQA_AUTOMATION")
 # BUILT_IN_GIS = MySecrets.get_portal_gis(environment="BUILT-IN_ENV", user="CREATOR")
-MY_PORTAL = MySecrets.get_portal_gis(environment="MY_PORTAL", user="CREATOR")
-TARGET_FOLDER = "Toronto_Police_Backup"
+# MY_PORTAL = MySecrets.get_portal_gis(environment="MY_PORTAL", user="CREATOR")
+TARGET_FOLDER = "_Cloned"
 
 
 # Clone an item
-item = GIS_2.content.get("3efee0781d3f49988d42f18b1ff8b59b")
-MY_PORTAL.content.clone_items(items=[item], folder=TARGET_FOLDER)
+item = GIS.content.get("6c1fe1c6be4f4d948e30e8bf0bf60655")
+GIS_2.content.clone_items(items=[item], folder=TARGET_FOLDER)
 
 # 'fb2676810dd947eeb9d04a377376fad1'
 # 'fbe59de7e1404fa694b91e231262af53'
