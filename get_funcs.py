@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 import time
 import subprocess
 from json.decoder import JSONDecodeError
+from other.my_secrets import MySecrets
 
 
 def get_all_items_in_org(gis_obj, item_type="Dashboard"):
@@ -396,5 +397,14 @@ def export_agol_item(item, export_title, export_format):
     return item.export(title=export_title, export_format=export_format)
 
 
+def download_item(item, save_path=None):
+    print(item.download(save_path=save_path))
+
+
 if __name__ == "__main__":
-    print("I am running from __main___")
+    GIS_1 = MySecrets.get_agol_gis("DEV_ENV", "DBQA_REGRESSION")
+    ITEM = GIS_1.content.get("7bc7b3c3625f4458b51d96da9a3dc123")
+    exported_item = export_agol_item(
+        ITEM, "Fire_Incidents_FGB", export_format="File Geodatabase"
+    )
+    print(exported_item)

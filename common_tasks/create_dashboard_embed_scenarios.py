@@ -42,12 +42,12 @@ def add_dashboard_sections_to_storymap(
 
 
 if __name__ == "__main__":
-    gis_obj = MySecrets.get_agol_gis("PROD_ENV", "DBQA_REGRESSION")
+    gis_obj = MySecrets.get_agol_gis("DEV_ENV", "DBQA_REGRESSION")
     dashboard_items = get_funcs.get_items_from_folder(
-        gis_obj, "Sharing_Options", item_types=["Dashboard"]
+        gis_obj, "Sharing_Options_Dashboards_Edge_Cases", item_types=["Dashboard"]
     )
-    build_name = "Production 8.2"
-    build_type = "4X_PROD_GENERIC"
+    build_name = "Devext Beta II"
+    build_type = "4X_DEV_ORG"
     title = f"Dashboard Embed Scenarios with {build_name} urls {build_type}"
     # url_params = AGOL_DICT["DEV_URL_PARAM"]
     storymap = JournalStoryMap(gis_obj)

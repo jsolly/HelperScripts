@@ -13,7 +13,7 @@ TARGET_FOLDER = "_Cloned"
 
 
 # Clone an item
-item = GIS.content.get("6c1fe1c6be4f4d948e30e8bf0bf60655")
+item = GIS.content.get("be9ea3a77029418194ee2054e172c776")
 GIS_2.content.clone_items(items=[item], folder=TARGET_FOLDER)
 
 # 'fb2676810dd947eeb9d04a377376fad1'
