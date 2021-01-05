@@ -18,7 +18,6 @@ def add_dashboard_sections_to_storymap(
         "3X_DEV_GENERIC": f"{AGOL_DICT['DEV_ENV']}/apps/opsdashboard/index.html#",
         "4X_DEV_ORG": f"{AGOL_DICT['DEV_ORG_ENV']}/apps/dashboards",
         "3X_DEV_ORG": f"{AGOL_DICT['DEV_ORG_ENV']}/apps/opsdashboard/index.html#",
-        "4X_QA_GENERIC": f"{AGOL_DICT['QA_ENV']}/apps/dashboards",
         "4X_PROD_GENERIC": f"{AGOL_DICT['PROD_ENV']}/apps/dashboards",
         "3X_PROD_GENERIC": f"{AGOL_DICT['PROD_ENV']}/apps/opsdashboard/index.html#",
         "4X_PROD_ORG": f"{AGOL_DICT['PROD_ORG_ENV']}/apps/dashboards",
@@ -44,17 +43,22 @@ def add_dashboard_sections_to_storymap(
 
 
 if __name__ == "__main__":
-    GIS_OBJ = MySecrets.get_agol_gis("QA_ENV", "DBQA_REGRESSION")
+    # GIS_OBJ = MySecrets.get_agol_gis("DEV_ENV", "DBQA_REGRESSION")
 
-    # GIS_OBJ = MySecrets.get_portal_gis(environment="MY_PORTAL", user="ENT_REGRESSION")
-    dashboard_items = get_funcs.get_items_from_folder(
-        GIS_OBJ, "Sharing_Options", item_types=["Dashboard"]
+    DBQA_GIS_OBJ = MySecrets.get_portal_gis(
+        environment="MY_PORTAL", user="ENT_REGRESSION"
     )
-    build_name = "Beta II QAEXT Dashboards"
-    build_type = "4X_QA_GENERIC"
-    title = f"Shared to Everyone Dashboard in-depth Embed Scenarios with {build_name} urls {build_type}"
+    NITRO_GIS_OBJ = MySecrets.get_portal_gis(
+        environment="3X_DEV_ORG", user="NITRO_ADMIN"
+    )
+    dashboard_items = get_funcs.get_items_from_folder(
+        DBQA_GIS_OBJ, "Sharing_Options_Dashboards_Edge_Cases", item_types=["Dashboard"]
+    )
+    build_name = "10.8.1 Enterprise Portal Classic Dashboards"
+    build_type = "MY_PORTAL"
+    title = f"Dashboard in-depth Embed Scenarios with {build_name} urls {build_type}"
     # url_params = AGOL_DICT["DEV_URL_PARAM"]
-    storymap = JournalStoryMap(GIS_OBJ)
+    storymap = JournalStoryMap(DBQA_GIS_OBJ)
     storymap_obj = add_dashboard_sections_to_storymap(
         storymap_obj=storymap,
         dashboard_items=dashboard_items,
